@@ -15,7 +15,7 @@ import (
 )
 
 func main() {
-	file, err := os.Open("./matrix.txt")
+	file, err := os.Open("assets/navetteIPs.txt")
 	// Can't wait forever if a Navette is powered off
 	client := http.Client{
 		Timeout: 10 * time.Second,
@@ -89,11 +89,49 @@ func main() {
 		defer res.Body.Close()
 	}
 
+	// // TODO implement excel things
+	// 	file, err := excelize.OpenFile(os.Args[1])
+	// 	if err != nil {
+	// 		fmt.Println(err)
+	// 		return
+	// 	}
+
+	// 	// Get all the rows in the Sheet1.
+	// 	rows := file.GetRows("Sheet1")
+	// 	for _, row := range rows {
+	// 		level(row[1], flr, row)
+	// 	}
+
+	// // Create new file and write sorted rows
+	// sortedFile := excelize.NewFile()
+
+	// sortedFile.SetColWidth("Sheet1", "A", "C", 25)
+
+	// // style, err := sortedFile.NewStyle(`"alignment": {"horizontal": "right"}`)
+	// // sortedFile.SetColStyle("Sheet1", "B:C", style)
+
+	// if err != nil {
+	// 	fmt.Println(err)
+	// 	return
+	// }
+
+	// var rowIndex int
+
+	// sortedFile.SetSheetRow("Sheet1", "A1", &[]interface{}{"STOLOC", "LUID", "Verified LUID"})
+
+	// for idx, sortedFlr := range flr.f4 {
+	// 	// Sheet to write, row index to write, convert slice to interface
+	// 	sortedFile.SetSheetRow("Sheet1", "A"+strconv.Itoa(idx+2), &[]interface{}{sortedFlr[1], sortedFlr[2], sortedFlr[3]})
+	// 	rowIndex = idx + 2
+	// 	// fmt.Println("f4", sortedFlr)
+	// }
+
 	if err := scanner.Err(); err != nil {
 		log.Fatal(err)
 	}
 }
 
+// TODO you don't need this
 func cleanString(s []string) string {
 	// strings.Join converts the string array to string
 	// strings.Replace removes the [] in the string
