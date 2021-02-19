@@ -4,9 +4,11 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"os"
 	"path/filepath"
+	"regexp"
 	"time"
 
 	"gopkg.in/yaml.v2"
@@ -42,7 +44,25 @@ func init() {
 		// os.Mkdir("scannedIPs", 777)
 	}
 
-	err = Copy("./travel.xlsm", "./old/travel.xlsm")
+	// find current workboo
+	re := regexp.MustCompile(`^([a-zA-Z0-9\s_\\.\-\(\):])+\.(xlsx|xlsm)$`)
+
+	files, err := ioutil.ReadDir(".")
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	for _, file := range files {
+		match := re.FindStringSubmatch(file.Name())
+		if len(match) > 0 {
+			fmt.Println(match[0])
+			dest := "./old/" + match[0]
+			err = Copy(match[0], dest)
+		}
+	}
+
+	// err = Copy("./travel.xlsm", "./old/travel.xlsm")
 
 	GetConfig()
 }

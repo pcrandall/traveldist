@@ -21,27 +21,19 @@ func main() {
 	defer output.Close()
 
 	for _, val := range config.Levels {
-		fmt.Printf("Floor: [%d]\n", val.Floor)
+		// fmt.Printf("Floor: [%d]\n", val.Floor)
 		for _, v := range val.Navette {
-			fmt.Printf("Name: %s, IP: %s, Row: %s\n", v.Name, v.IP, v.Row)
-
-			// Were writing to the text file here
-			// _, err = io.WriteString(output, v.Name+"\n")
-			// if err != nil {
-			// 	log.Fatal(err)
-			// }
-			// output.Sync()
-
+			// fmt.Printf("Name: %s, IP: %s, Row: %s\n", v.Name, v.IP, v.Row)
 			res, err := client.Get("http://" + v.IP + "/srm1TravelDistanceList.html")
 			if err != nil {
-				io.WriteString(output, "¯\\_(ツ)_/¯ Guess I'm real dead\n")
-				fmt.Println("ERROR:", err, "\n")
+				io.WriteString(output, "¯\\_(ツ)_/¯\n")
+				fmt.Println("¯\\_(ツ)_/¯:", err)
 				continue
 			}
 
 			body, err := ioutil.ReadAll(res.Body)
 			if err != nil {
-				fmt.Println("ERROR:", err, "\n")
+				fmt.Println("¯\\_(ツ)_/¯:", err)
 				continue
 			}
 
@@ -58,10 +50,11 @@ func main() {
 				// the most recent update is the last element, grab the distance from there.
 				if index == len(submatchall)-1 {
 					f := element[0]
-					if s, err := strconv.ParseFloat(f[7:], 64); err == nil {
-						km := s / 10000
+					if _, err := strconv.ParseFloat(f[7:], 64); err == nil {
+						// if s, err := strconv.ParseFloat(f[7:], 64); err == nil {
+						// km := s / 10000
 						//skm := strconv.FormatFloat(km, 'f', 0, 64)
-						fmt.Printf("Collector Shoe distance:\n\t %s\n\t %.f km\n\n", f[7:], km)
+						// fmt.Printf("Collector Shoe distance:\n\t %s\n\t %.f km\n\n", f[7:], km)
 						io.WriteString(output, v.Name+"  "+f[7:]+"\n")
 						output.Sync()
 						// fmt.Println("\t", f[7:])
