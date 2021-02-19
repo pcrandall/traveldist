@@ -2,23 +2,74 @@ package main
 
 import (
 	"fmt"
-	"io"
 	"io/ioutil"
 	"log"
+	"math"
+	"net/http"
 	"os"
 	"regexp"
 	"strconv"
+	"time"
+
+	"github.com/360EntSecGroup-Skylar/excelize"
+)
+
+var (
+	client = &http.Client{
+		Timeout: 10 * time.Second,
+	}
+	config        *Config
+	err           error
+	writeColumn   int
+	writeFileName string
+	logfile       *os.File
 )
 
 func main() {
 
-	output, err := os.Create("collectorShoesDistances.txt")
+	logfile, err = os.OpenFile("logfile.txt", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("error opening file: %v", err)
 	}
 
-	defer output.Close()
+	log.SetOutput(logfile)
+
+	defer logfile.Close()
+
+	// find current workbook
+	re := regexp.MustCompile(`^([a-zA-Z0-9\s_\\.\-\(\):])+\.(xlsx|xlsm)$`)
+	files, err := ioutil.ReadDir(".")
+	if err != nil {
+		log.Panic(err)
+	}
+
+	for _, file := range files {
+		match := re.FindStringSubmatch(file.Name())
+
+		if len(match) > 0 {
+			dest := "./old/" + match[0]
+
+			err = Copy(match[0], dest)
+
+			if err != nil {
+				log.Println("Latest travel distance file must be in the same directory as Travel Distance.exe")
+				log.Panic(err)
+			}
+			writeColumn, err = findLastColumn(match[0], config.SheetName)
+			writeFileName = match[0]
+		}
+	}
+
+	// fmt.Println("writeColumn here: ", writeColumn)
+	// fmt.Println("writeFileName here: ", writeFileName)
+
+	file, err := excelize.OpenFile(writeFileName)
+	if err != nil {
+		log.Println("Latest travel distance file must be in the same directory as Travel Distance.exe")
+		log.Panic(err)
+		return
+	}
 
 	for _, val := range config.Levels {
 		// fmt.Printf("Floor: [%d]\n", val.Floor)
@@ -26,14 +77,15 @@ func main() {
 			// fmt.Printf("Name: %s, IP: %s, Row: %s\n", v.Name, v.IP, v.Row)
 			res, err := client.Get("http://" + v.IP + "/srm1TravelDistanceList.html")
 			if err != nil {
-				io.WriteString(output, "¯\\_(ツ)_/¯\n")
-				fmt.Println("¯\\_(ツ)_/¯:", err)
+				log.Println("Navette:", v.Name, "IP address:", v.IP, "Error:", err)
+				fmt.Println("Navette:", v.Name, "IP address:", v.IP, "Error:", err)
 				continue
 			}
 
 			body, err := ioutil.ReadAll(res.Body)
 			if err != nil {
-				fmt.Println("¯\\_(ツ)_/¯:", err)
+				log.Println(v.Name, v.IP, err)
+				fmt.Println(v.Name, v.IP, err)
 				continue
 			}
 
@@ -49,127 +101,74 @@ func main() {
 			for index, element := range submatchall {
 				// the most recent update is the last element, grab the distance from there.
 				if index == len(submatchall)-1 {
-					f := element[0]
-					if _, err := strconv.ParseFloat(f[7:], 64); err == nil {
-						// if s, err := strconv.ParseFloat(f[7:], 64); err == nil {
-						// km := s / 10000
-						//skm := strconv.FormatFloat(km, 'f', 0, 64)
-						// fmt.Printf("Collector Shoe distance:\n\t %s\n\t %.f km\n\n", f[7:], km)
-						io.WriteString(output, v.Name+"  "+f[7:]+"\n")
-						output.Sync()
-						// fmt.Println("\t", f[7:])
+					total := element[0]
+					// total is this:
+					// Total: 15440653
+					if _, err := strconv.ParseFloat(total[7:], 64); err == nil {
+						row, _ := strconv.Atoi(v.Row)
+						writeCoord := getColumn(writeColumn, row)
+						// fmt.Println("getColumn here: ", writeCoord)
+						fmt.Println(v.Name, total[7:])
+						file.SetCellValue(config.SheetName, writeCoord, total[7:])
 					}
 				}
 			}
-
 			defer res.Body.Close()
 		}
 	}
 
-	//for scanner.Scan() {
-	//	txt := strings.Split(scanner.Text(), " ")
-	//	ip := txt[0]
-	//	nav := cleanString(txt[1:])
+	if err := file.Save(); err != nil {
+		log.Panic(err)
+	}
 
-	//	fmt.Println(nav, "\nURL:", "http://"+ip+"/srm1TravelDistanceList.html")
+	userInput := ""
+	fmt.Println("[Press enter to close]")
+	fmt.Scanf("%s", &userInput)
+}
 
-	//	Were writing to the text file here
-	//	_, err = io.WriteString(output, nav+"\n")
-	//	if err != nil {
-	//		log.Fatal(err)
-	//	}
-	//	output.Sync()
+func getColumn(idx int, row int) string {
+	var coord string
+	base := 26
 
-	//	res, err := client.Get("http://" + ip + "/srm1TravelDistanceList.html")
-	//	if err != nil {
-	//		io.WriteString(output, "¯\\_(ツ)_/¯ Guess I'm real dead\n")
-	//		fmt.Println("ERROR:", err, "\n")
-	//		continue
-	//	}
+	if idx > base {
+		if idx < int(math.Pow(float64(base), 2)) {
+			first := idx / base
+			rem := idx % base
+			// fmt.Println(fmt.Sprintf("%x", first))
+			// fmt.Println(fmt.Sprintf("%x", rem))
+			coord = string(first+64) + string(rem+64) + strconv.Itoa(row)
+			// fmt.Println(string(first+64), string(rem+64))
+		} else {
+			log.Panic("13 years worth of columns is a long time. Great Job! It's time to start over now. Delete columns on page", config.SheetName)
+		}
+	} else {
+		coord = string(idx + 64)
+	}
+	// fmt.Println(coord)
+	return coord
+}
 
-	//	body, err := ioutil.ReadAll(res.Body)
-	//	if err != nil {
-	//		fmt.Println("ERROR:", err, "\n")
-	//		continue
-	//	}
-
-	//	pageContent := string(body)
-
-	//	//<td>I</td><td>2020-09-02 15:16:15:415</td><td id="desc"></td><td>TD Total: 4598010 4598010 </td><td>Td: 0 4598010 </td></td> err <nil>
-	//	// this returns all elements in the page that look like the above
-	//	r := regexp.MustCompile(`Total:(.\d*|\s*|\d*)`)
-
-	//	// give me all the matches
-	//	submatchall := r.FindAllStringSubmatch(pageContent, -1)
-
-	//	for index, element := range submatchall {
-	//		// the most recent update is the last element, grab the distance from there.
-	//		if index == len(submatchall)-1 {
-	//			f := element[0]
-	//			if s, err := strconv.ParseFloat(f[7:], 64); err == nil {
-	//				km := s / 10000
-	//				//skm := strconv.FormatFloat(km, 'f', 0, 64)
-	//				fmt.Printf("Collector Shoe distance:\n\t %s\n\t %.f km\n\n", f[7:], km)
-	//				io.WriteString(output, nav+"  "+f[7:]+"\n")
-	//				output.Sync()
-	//				// fmt.Println("\t", f[7:])
-	//			}
-	//		}
-	//	}
-
-	//	defer res.Body.Close()
-	//}
-
-	// // TODO implement excel things
-	// 	file, err := excelize.OpenFile(os.Args[1])
-	// 	if err != nil {
-	// 		fmt.Println(err)
-	// 		return
-	// 	}
-
-	// 	// Get all the rows in the Sheet1.
-	// 	rows := file.GetRows("Sheet1")
-	// 	for _, row := range rows {
-	// 		level(row[1], flr, row)
-	// 	}
-
-	// // Create new file and write sorted rows
-	// sortedFile := excelize.NewFile()
-
-	// sortedFile.SetColWidth("Sheet1", "A", "C", 25)
-
-	// // style, err := sortedFile.NewStyle(`"alignment": {"horizontal": "right"}`)
-	// // sortedFile.SetColStyle("Sheet1", "B:C", style)
-
-	// if err != nil {
-	// 	fmt.Println(err)
-	// 	return
-	// }
-
-	// var rowIndex int
-
-	// sortedFile.SetSheetRow("Sheet1", "A1", &[]interface{}{"STOLOC", "LUID", "Verified LUID"})
-
-	// for idx, sortedFlr := range flr.f4 {
-	// 	// Sheet to write, row index to write, convert slice to interface
-	// 	sortedFile.SetSheetRow("Sheet1", "A"+strconv.Itoa(idx+2), &[]interface{}{sortedFlr[1], sortedFlr[2], sortedFlr[3]})
-	// 	rowIndex = idx + 2
-	// 	// fmt.Println("f4", sortedFlr)
-	// }
-
-	// if err := scanner.Err(); err != nil {
-	// 	log.Fatal(err)
-	// }
-	//}
-
-	// TODO you don't need this
-	// func cleanString(s []string) string {
-	// 	// strings.Join converts the string array to string
-	// 	// strings.Replace removes the [] in the string
-	// 	// strings.Trim removes the whitespace
-	// 	n := strings.Join(s[1:], " ")
-	// 	n = strings.Replace(n, "[", "", -1)
-	// 	n = strings.Trim(n, " ")
-	// 	return n
-	// }
+func findLastColumn(inFile string, sheetName string) (write int, err error) {
+	s, err := excelize.OpenFile(inFile)
+	if err != nil {
+		return -1, err
+	}
+	rows := s.GetRows(sheetName)
+	for rowInt, row := range rows {
+		for colInt, colCell := range row {
+			if rowInt == 5 {
+				value := colCell
+				if value != "" {
+					// fmt.Println(fmt.Sprintf("column: %v, value: %v", colInt+1, value))
+					writeColumn = colInt + 1
+				}
+			}
+		}
+		if rowInt == 5 {
+			break
+		}
+	}
+	// rows start at 1, idx starts a 0, add one.
+	writeColumn++
+	return writeColumn, err
 }

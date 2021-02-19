@@ -1,8 +1,5 @@
 GOBINDATA := $(shell command -v go-bindata 2> /dev/null)
-
-currentDir = $(shell pwd)
-releasesOutputDir = ${currentDir}/releases/$(date +'%F')
-workOutputDir = ${WINDIR}/Projects/_sshClient/releases/$(date +'%F')/config
+currentDir := $(shell pwd)
 
 ## installation
 install:
@@ -25,6 +22,8 @@ run:
 .PHONY: run
 
 ## @echo "OS not defined, Usage: make build windows"
+	#@./scripts/build.sh
+
 build:
 	@echo "==> building travelDistance"
 	@${currentDir}/scripts/build.sh

@@ -4,18 +4,15 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
-	"log"
-	"net/http"
 	"os"
 	"path/filepath"
-	"regexp"
-	"time"
 
 	"gopkg.in/yaml.v2"
 )
 
 type Config struct {
-	Levels []struct {
+	SheetName string `yaml:"sheetname"`
+	Levels    []struct {
 		Floor   int `yaml:"floor"`
 		Navette []struct {
 			Name string `yaml:"name"`
@@ -25,46 +22,16 @@ type Config struct {
 	} `yaml:"levels"`
 }
 
-var (
-	config *Config
-
-	client = &http.Client{
-		Timeout: 10 * time.Second,
-	}
-
-	err error
-)
-
 func init() {
+
+	GetConfig()
 
 	newpath := filepath.Join(".", "old")
 
 	if _, err = os.Stat(newpath); os.IsNotExist(err) {
 		os.MkdirAll(newpath, os.ModePerm)
-		// os.Mkdir("scannedIPs", 777)
 	}
 
-	// find current workboo
-	re := regexp.MustCompile(`^([a-zA-Z0-9\s_\\.\-\(\):])+\.(xlsx|xlsm)$`)
-
-	files, err := ioutil.ReadDir(".")
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	for _, file := range files {
-		match := re.FindStringSubmatch(file.Name())
-		if len(match) > 0 {
-			fmt.Println(match[0])
-			dest := "./old/" + match[0]
-			err = Copy(match[0], dest)
-		}
-	}
-
-	// err = Copy("./travel.xlsm", "./old/travel.xlsm")
-
-	GetConfig()
 }
 
 func GetConfig() {
