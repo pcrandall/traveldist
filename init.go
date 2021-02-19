@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -28,22 +29,20 @@ var (
 	client = &http.Client{
 		Timeout: 10 * time.Second,
 	}
+
+	err error
 )
 
 func init() {
 
 	newpath := filepath.Join(".", "old")
-	if _, err := os.Stat(newpath); os.IsNotExist(err) {
+
+	if _, err = os.Stat(newpath); os.IsNotExist(err) {
 		os.MkdirAll(newpath, os.ModePerm)
 		// os.Mkdir("scannedIPs", 777)
 	}
 
-	travelDistFile, err := os.Create("tmp.xlsx")
-	if err != nil {
-		panic(err)
-	}
-
-	fmt.Fprintln(travelDistFile)
+	err = Copy("./travel.xlsm", "./old/travel.xlsm")
 
 	GetConfig()
 }
@@ -71,4 +70,26 @@ func GetConfig() {
 		fmt.Println("Schrodinger: file may or may not exist. See err for details.")
 		// panic(err)
 	}
+}
+
+// Copy the src file to dst. Any existing file will be overwritten and will not
+// copy file attributes.
+func Copy(src, dst string) error {
+	in, err := os.Open(src)
+	if err != nil {
+		return err
+	}
+	defer in.Close()
+
+	out, err := os.Create(dst)
+	if err != nil {
+		return err
+	}
+	defer out.Close()
+
+	_, err = io.Copy(out, in)
+	if err != nil {
+		return err
+	}
+	return out.Close()
 }
