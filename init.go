@@ -23,15 +23,11 @@ type Config struct {
 }
 
 func init() {
-
 	GetConfig()
-
 	newpath := filepath.Join(".", "old")
-
 	if _, err = os.Stat(newpath); os.IsNotExist(err) {
 		os.MkdirAll(newpath, os.ModePerm)
 	}
-
 }
 
 func GetConfig() {
@@ -59,8 +55,7 @@ func GetConfig() {
 	}
 }
 
-// Copy the src file to dst. Any existing file will be overwritten and will not
-// copy file attributes.
+// Copy the src file to dst. Any existing file will be overwritten and will not copy file attributes.
 func Copy(src, dst string) error {
 	in, err := os.Open(src)
 	if err != nil {

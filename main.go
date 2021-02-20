@@ -12,20 +12,42 @@ import (
 	"time"
 
 	"github.com/360EntSecGroup-Skylar/excelize"
+	tea "github.com/charmbracelet/bubbletea"
+	"github.com/theckman/yacspin"
 )
 
 var (
 	client = &http.Client{
 		Timeout: 10 * time.Second,
 	}
+
 	config        *Config
+	logfile       *os.File
 	err           error
+	writeRows     map[string]string
 	writeColumn   int
 	writeFileName string
-	logfile       *os.File
+	getNavette    string
+
+	clear map[string]func()
 )
 
 func main() {
+	//Initialize
+	writeRows = make(map[string]string)
+	cfg := yacspin.Config{
+		Frequency:       200 * time.Millisecond,
+		CharSet:         yacspin.CharSets[32],
+		Suffix:          "Getting Travel Distances",
+		SuffixAutoColon: false,
+		Message:         getNavette,
+		StopCharacter:   "√",
+		StopMessage:     " Completed!",
+		StopColors:      []string{"fgGreen"},
+		Colors:          []string{"fgCyan"},
+	}
+
+	printHeader("TRAVELDIST")
 
 	logfile, err = os.OpenFile("logfile.txt", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 
@@ -71,9 +93,17 @@ func main() {
 		return
 	}
 
+	spinner, err := yacspin.New(cfg) // handle the error
+	if err != nil {
+		panic(err)
+	}
+	spinner.Start() // Start the spinner
+
 	for _, val := range config.Levels {
 		// fmt.Printf("Floor: [%d]\n", val.Floor)
 		for _, v := range val.Navette {
+			getNavette = v.Name
+			writeRows[v.Name] = v.Row
 			// fmt.Printf("Name: %s, IP: %s, Row: %s\n", v.Name, v.IP, v.Row)
 			res, err := client.Get("http://" + v.IP + "/srm1TravelDistanceList.html")
 			if err != nil {
@@ -108,7 +138,7 @@ func main() {
 						row, _ := strconv.Atoi(v.Row)
 						writeCoord := getColumn(writeColumn, row)
 						// fmt.Println("getColumn here: ", writeCoord)
-						fmt.Println(v.Name, total[7:])
+						// fmt.Println(v.Name, total[7:])
 						file.SetCellValue(config.SheetName, writeCoord, total[7:])
 					}
 				}
@@ -117,13 +147,22 @@ func main() {
 		}
 	}
 
-	if err := file.Save(); err != nil {
+	spinner.Stop() // connected stop spinner
+
+	// fmt.Println("before tea program filename: ", writeFileName)
+	// fmt.Printf("tea here: %v, %T\n\n", p, p)
+	p := tea.NewProgram(initialModel())
+
+	if err := p.Start(); err != nil {
 		log.Panic(err)
 	}
 
-	userInput := ""
-	fmt.Println("[Press enter to close]")
-	fmt.Scanf("%s", &userInput)
+	// fmt.Println("after tea program filename: ", writeFileName)
+	if err := file.SaveAs(writeFileName); err != nil {
+		log.Panic(err)
+	}
+
+	// fmt.Println("Write rows here: ", writeRows)
 }
 
 func getColumn(idx int, row int) string {
