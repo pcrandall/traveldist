@@ -27,6 +27,7 @@ var (
 	writeRows     map[string]string
 	writeColumn   int
 	writeFileName string
+	oldFilename   string
 	getNavette    string
 
 	clear map[string]func()
@@ -47,7 +48,7 @@ func main() {
 		Colors:          []string{"fgCyan"},
 	}
 
-	printHeader("TRAVELDIST")
+	// printHeader("TRAVELDIST")
 
 	logfile, err = os.OpenFile("logfile.txt", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 
@@ -149,20 +150,25 @@ func main() {
 
 	spinner.Stop() // connected stop spinner
 
-	// fmt.Println("before tea program filename: ", writeFileName)
-	// fmt.Printf("tea here: %v, %T\n\n", p, p)
+	oldFilename = writeFileName
+
 	p := tea.NewProgram(initialModel())
 
 	if err := p.Start(); err != nil {
 		log.Panic(err)
 	}
 
-	// fmt.Println("after tea program filename: ", writeFileName)
 	if err := file.SaveAs(writeFileName); err != nil {
 		log.Panic(err)
 	}
 
-	// fmt.Println("Write rows here: ", writeRows)
+	// renamed file delete old file
+	if oldFilename != writeFileName {
+		err = os.Remove(oldFilename)
+		if err != nil {
+			log.Panic(err)
+		}
+	}
 }
 
 func getColumn(idx int, row int) string {

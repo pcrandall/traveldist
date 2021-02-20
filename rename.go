@@ -32,8 +32,8 @@ func initialModel() model {
 }
 
 func (m model) Init() tea.Cmd {
-	// return textinput.Blink
-	return nil
+	return textinput.Blink
+	// return nil
 }
 
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -68,7 +68,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (m model) View() string {
 	return fmt.Sprintf(
-		"What would you like to save workbook as?\n\n%s\n\n%s",
+		"\nWhat would you like to save workbook as?\n\n%s\n\n%s",
 		m.textInput.View(),
 		"[Press tab to autocomplete, Enter when finished]",
 	) + "\n"

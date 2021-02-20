@@ -43,11 +43,10 @@ func printHeader(str string) {
 	// change the font color
 	// uncomment to activate colors
 	colors := [...]color.Attribute{
-		// color.FgWhite,
+		color.FgWhite,
 		// color.FgMagenta,
-		color.FgYellow,
+		// color.FgYellow,
 		// color.FgCyan,
-		// color.FgRed,
 		// color.FgBlue,
 		// color.FgHiGreen,
 		// color.FgGreen,
@@ -56,6 +55,7 @@ func printHeader(str string) {
 	options.FontColor = make([]color.Attribute, len(str))
 	for i := range options.FontColor {
 		options.FontColor[i] = colors[i%len(colors)]
+
 	}
 
 	// you can add more fonts like this if you want
