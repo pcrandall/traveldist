@@ -5,6 +5,8 @@ import (
 	"os"
 	"os/exec"
 	"runtime"
+	"strconv"
+	"time"
 
 	"github.com/fatih/color"
 	"github.com/pcrandall/figlet4go"
@@ -35,8 +37,11 @@ func init() {
 
 func printHeader(str string) {
 	callClear()
+	t := time.Now()
+	y := t.Year()
+	y -= 2000 // ill be suprised if im using this in 2100
 	padding := ""
-	signature := "pcrandall '21"
+	signature := "pcrandall '" + strconv.Itoa(y)
 	paddingLen := 0
 
 	ascii := figlet4go.NewAsciiRender()
@@ -58,8 +63,7 @@ func printHeader(str string) {
 
 	}
 
-	// you can add more fonts like this if you want
-	// ascii.LoadFont("./fonts/bigMoneyNE.flf")
+	// you can add more fonts like this if you want ascii.LoadFont("./fonts/bigMoneyNE.flf")
 	renderStr, _ := ascii.RenderOpts(str, options)
 
 	// calculate the correct padding for the signature 11 is the font height

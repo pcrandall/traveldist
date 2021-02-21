@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
-	"math"
 	"net/http"
 	"os"
 	"regexp"
@@ -84,9 +83,6 @@ func main() {
 		}
 	}
 
-	// fmt.Println("writeColumn here: ", writeColumn)
-	// fmt.Println("writeFileName here: ", writeFileName)
-
 	file, err := excelize.OpenFile(writeFileName)
 	if err != nil {
 		log.Println("Latest travel distance file must be in the same directory as Travel Distance.exe")
@@ -132,15 +128,13 @@ func main() {
 			for index, element := range submatchall {
 				// the most recent update is the last element, grab the distance from there.
 				if index == len(submatchall)-1 {
-					total := element[0]
-					// total is this:
-					// Total: 15440653
+					total := element[0] // Total: 15440653
 					if _, err := strconv.ParseFloat(total[7:], 64); err == nil {
 						row, _ := strconv.Atoi(v.Row)
-						writeCoord := getColumn(writeColumn, row)
-						// fmt.Println("getColumn here: ", writeCoord)
-						// fmt.Println(v.Name, total[7:])
-						file.SetCellValue(config.SheetName, writeCoord, total[7:])
+						writeCoord := buildCoordinate(writeColumn, row)
+						// file.SetCellValue(config.SheetName, writeCoord, total[7:])
+						td, _ := strconv.Atoi(total[7:]) // convert to int here so workbook doesn't complain
+						file.SetCellValue(config.SheetName, writeCoord, td)
 					}
 				}
 			}
@@ -150,7 +144,7 @@ func main() {
 
 	spinner.Stop() // connected stop spinner
 
-	oldFilename = writeFileName
+	oldFilename = writeFileName // store filename for comparison later
 
 	p := tea.NewProgram(initialModel())
 
@@ -158,39 +152,40 @@ func main() {
 		log.Panic(err)
 	}
 
-	if err := file.SaveAs(writeFileName); err != nil {
-		log.Panic(err)
-	}
-
-	// renamed file delete old file
-	if oldFilename != writeFileName {
-		err = os.Remove(oldFilename)
-		if err != nil {
+	// check that the new filename is not empty, if so use old filename
+	if writeFileName == "" {
+		if err := file.SaveAs(oldFilename); err != nil {
+			log.Panic(err)
+		}
+	} else {
+		// renamed file delete old file
+		if err := file.SaveAs(writeFileName); err != nil {
+			log.Panic(err)
+		}
+		if err = os.Remove(oldFilename); err != nil {
 			log.Panic(err)
 		}
 	}
 }
 
-func getColumn(idx int, row int) string {
-	var coord string
-	base := 26
-
-	if idx > base {
-		if idx < int(math.Pow(float64(base), 2)) {
-			first := idx / base
-			rem := idx % base
-			// fmt.Println(fmt.Sprintf("%x", first))
-			// fmt.Println(fmt.Sprintf("%x", rem))
-			coord = string(first+64) + string(rem+64) + strconv.Itoa(row)
-			// fmt.Println(string(first+64), string(rem+64))
+func buildCoordinate(n int, row int) string {
+	// https://www.geeksforgeeks.org/find-excel-column-name-given-number
+	str, result := "", ""
+	for n > 0 {
+		rem := n % 26
+		if rem == 0 {
+			str += string(90) // string(90) = "Z"
+			n = (n / 26) - 1
 		} else {
-			log.Panic("13 years worth of columns is a long time. Great Job! It's time to start over now. Delete columns on page", config.SheetName)
+			str += string(rem + 64)
+			n /= 26
 		}
-	} else {
-		coord = string(idx + 64)
 	}
-	// fmt.Println(coord)
-	return coord
+	for _, v := range str {
+		result = string(v) + result
+	}
+	// fmt.Println("coordinate here: ", result+strconv.Itoa(row))
+	return result + strconv.Itoa(row)
 }
 
 func findLastColumn(inFile string, sheetName string) (write int, err error) {
@@ -199,21 +194,19 @@ func findLastColumn(inFile string, sheetName string) (write int, err error) {
 		return -1, err
 	}
 	rows := s.GetRows(sheetName)
-	for rowInt, row := range rows {
-		for colInt, colCell := range row {
-			if rowInt == 5 {
-				value := colCell
-				if value != "" {
-					// fmt.Println(fmt.Sprintf("column: %v, value: %v", colInt+1, value))
-					writeColumn = colInt + 1
-				}
-			}
-		}
-		if rowInt == 5 {
-			break
+	// fmt.Println("row here: ", rows[5])
+	// fmt.Println("row here: ", len(rows[5]))
+	val := ""
+	row := rows[5]
+
+	for i := len(row) - 1; val == ""; i-- {
+		val = string(row[i])
+		if val != "" {
+			writeColumn = i + 1
 		}
 	}
-	// rows start at 1, idx starts a 0, add one.
 	writeColumn++
+	// fmt.Println("writeColumn here: ", writeColumn)
+	// fmt.Println("writeColumn here: ", buildCoordinate(writeColumn, 6))
 	return writeColumn, err
 }
