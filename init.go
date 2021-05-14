@@ -5,6 +5,7 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
+	"os/exec"
 	"path/filepath"
 
 	"gopkg.in/yaml.v2"
@@ -23,11 +24,36 @@ type Config struct {
 }
 
 func init() {
-	GetConfig()
+
+	clear = make(map[string]func()) //Initialize it
+
+	clear["linux"] = func() {
+		cmd := exec.Command("clear") //Linux example, its tested
+		cmd.Stdout = os.Stdout
+		cmd.Run()
+	}
+	clear["windows"] = func() {
+		cmd := exec.Command("cmd", "/c", "cls") //Windows example, its tested
+		cmd.Stdout = os.Stdout
+		cmd.Run()
+	}
+
 	newpath := filepath.Join(".", "old")
 	if _, err = os.Stat(newpath); os.IsNotExist(err) {
 		os.MkdirAll(newpath, os.ModePerm)
 	}
+
+	logpath := filepath.Join(".", "logs")
+	if _, err := os.Stat(logpath); os.IsNotExist(err) {
+		os.MkdirAll(logpath, os.ModePerm)
+	}
+
+	dbpath := filepath.Join(".", "db")
+	if _, err := os.Stat(dbpath); os.IsNotExist(err) {
+		os.MkdirAll(dbpath, os.ModePerm)
+	}
+
+	GetConfig()
 }
 
 func GetConfig() {
