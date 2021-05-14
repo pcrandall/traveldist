@@ -132,9 +132,9 @@ func main() {
 					if _, err := strconv.ParseFloat(total[7:], 64); err == nil {
 						row, _ := strconv.Atoi(v.Row)
 						writeCoord := buildCoordinate(writeColumn, row)
-						// file.SetCellValue(config.SheetName, writeCoord, total[7:])
-						td, _ := strconv.Atoi(total[7:]) // convert to int here so workbook doesn't complain
-						file.SetCellValue(config.SheetName, writeCoord, td)
+						file.SetCellValue(config.SheetName, writeCoord, total[7:])
+						// td, _ := strconv.Atoi(total[7:]) // convert to int here so workbook doesn't complain
+						// file.SetCellValue(config.SheetName, writeCoord, td)
 					}
 				}
 			}
