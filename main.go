@@ -1,18 +1,28 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
+	"os/exec"
+	"path/filepath"
 	"regexp"
+	"runtime"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/360EntSecGroup-Skylar/excelize"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/dnote/color"
+	_ "github.com/mattn/go-sqlite3"
+	"github.com/olekukonko/tablewriter"
+	"github.com/pcrandall/figlet4go"
 	"github.com/theckman/yacspin"
+	// frames "github.com/pcrandall/mfsplaces/frames"
 )
 
 var (
@@ -209,4 +219,151 @@ func findLastColumn(inFile string, sheetName string) (write int, err error) {
 	// fmt.Println("writeColumn here: ", writeColumn)
 	// fmt.Println("writeColumn here: ", buildCoordinate(writeColumn, 6))
 	return writeColumn, err
+}
+
+func database(query string) {
+	db, err := sql.Open("sqlite3", "db/data.db")
+	defer db.Close()
+
+	checkErr(err)
+
+	db.Ping()
+
+	checkErr(err)
+
+	// statement, _ := db.Prepare("CREATE TABLE IF NOT EXISTS locations (id INTEGER PRIMARY KEY AUTOINCREMENT, location TEXT NOT NULL, description TEXT NOT NULL, area TEXT)")
+	// statement.Exec()
+
+	query = cleanString(fmt.Sprintf("%%%s%%", query))
+	rows, err := db.Query("SELECT location, description, area FROM locations WHERE location LIKE ?", query)
+
+	checkErr(err)
+
+	var location string
+	var description string
+	var area string
+	var table [][]string
+	for rows.Next() {
+		var val []string
+		rows.Scan(&location, &description, &area)
+		checkErr(err)
+
+		// fmt.Println("Location: ", location)
+		// fmt.Println("Description: ", description)
+		// fmt.Println("Area: ", area)
+
+		val = append(val, location)
+		val = append(val, description)
+		val = append(val, area)
+		table = append(table, val)
+	}
+
+	RenderTable(query, table)
+}
+
+func RenderTable(query string, locations [][]string) {
+	table := tablewriter.NewWriter(os.Stdout)
+	table.SetHeader([]string{"Location", "Description", "Area"})
+	table.SetTablePadding("\t") // pad with tabs
+	table.SetAutoWrapText(true)
+	table.SetAutoFormatHeaders(true)
+	table.SetRowLine(true)
+	table.SetCaption(true, "Query: "+strings.ReplaceAll(query, "%", ""))
+
+	for _, val := range locations {
+		var row = []string{cleanString(val[0]), cleanString(val[1]), cleanString(val[2])}
+		table.Append(row)
+		// fmt.Println(cleanString(val[0]), cleanString(val[1]), cleanString(val[2]))
+	}
+	table.Render() // Send output
+}
+
+func checkErr(err error) {
+	if err != nil {
+		log.Println(err)
+	}
+}
+
+func PrintHeader() {
+	CallClear()
+	ascii := figlet4go.NewAsciiRender()
+	colors := [...]color.Attribute{
+		color.FgHiYellow,
+	}
+	options := figlet4go.NewRenderOptions()
+	options.FontColor = make([]color.Attribute, len("MFS SEARCH"))
+	for i := range options.FontColor {
+		options.FontColor[i] = colors[i%len(colors)]
+	}
+	renderStr, _ := ascii.RenderOpts("MFS SEARCH", options)
+	// remove the last three blank rows, all uppercase chars have a height of 8, the font height for default font is 11
+	fmt.Println(renderStr[:len(renderStr)-len(renderStr)/11*3-1])
+	fmt.Printf("                                                                               hwelch pcrandall '21\n")
+}
+
+func init() {
+	resize = make(map[string]func())
+	resize["darwin"] = func() {
+		cmd := exec.Command("resize -s 35 120")
+		cmd.Stdout = os.Stdout
+		cmd.Run()
+	}
+	resize["linux"] = func() {
+		cmd := exec.Command("resize -s 35 120")
+		cmd.Stdout = os.Stdout
+		cmd.Run()
+	}
+	resize["windows"] = func() {
+		cmd := exec.Command("cmd", "/c", "mode con:cols=120 lines=30") //Windows example, its tested
+		cmd.Stdout = os.Stdout
+		cmd.Run()
+	}
+
+	clear = make(map[string]func()) //Initialize it
+	clear["darwin"] = func() {
+		cmd := exec.Command("clear") //Linux example, its tested
+		cmd.Stdout = os.Stdout
+		cmd.Run()
+	}
+	clear["linux"] = func() {
+		cmd := exec.Command("clear") //Linux example, its tested
+		cmd.Stdout = os.Stdout
+		cmd.Run()
+	}
+	clear["windows"] = func() {
+		cmd := exec.Command("cmd", "/c", "cls") //Windows example, its tested
+		cmd.Stdout = os.Stdout
+		cmd.Run()
+	}
+
+	logpath := filepath.Join(".", "logs")
+	if _, err := os.Stat(logpath); os.IsNotExist(err) {
+		os.MkdirAll(logpath, os.ModePerm)
+	}
+
+	dbpath := filepath.Join(".", "db")
+	if _, err := os.Stat(dbpath); os.IsNotExist(err) {
+		os.MkdirAll(dbpath, os.ModePerm)
+	}
+
+}
+
+func CallClear() {
+	value, ok := clear[runtime.GOOS] //runtime.GOOS -> linux, windows, darwin etc.
+	//if we defined a clear func for that platform:
+	if ok {
+		value() //we execute it
+	} else {
+		panic("Your platform is unsupported! I can't clear terminal screen :(") //unsupported platform
+	}
+}
+
+func ResizeWindow() {
+	value, ok := resize[runtime.GOOS] //runtime.GOOS -> linux, windows, darwin etc.
+	//if we defined a clear func for that platform:
+	if ok {
+		value() //we execute it
+	} else {
+		panic("Your platform is unsupported! I can't resize terminal screen :(") //unsupported platform
+	}
 }
