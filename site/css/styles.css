@@ -1,0 +1,288 @@
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-family: Arial, Helvetica, sans-serif;
+  line-height: 1;
+  background: #EAEAEA !important;
+  height: 100%;
+  margin: 0.5em;
+  font: "Segoe UI", Arial, Helvetica, sans-serif;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
+    monospace;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+.btn {
+  text-decoration: none;
+  display: inline-block;
+  border: none;
+  cursor: pointer;
+  -webkit-touch-callout: none; /* iOS Safari */
+  -webkit-user-select: none; /* Safari */
+  -khtml-user-select: none; /* Konqueror HTML */
+  -moz-user-select: none; /* Old versions of Firefox */
+  -ms-user-select: none; /* Internet Explorer/Edge */
+  user-select: none; /* Non-prefixed version, currently supported by Chrome, Opera and Firefox */
+}
+
+.headerContainer {
+  font: "Segoe UI", Arial, Helvetica, sans-serif;
+  font-size: 25px;
+  width: 98%;
+  margin: 5px auto;
+  padding: 16px;
+  background-color: yellow;
+}
+
+.containerStyle {
+  background: #eaeaea;
+  border: 1px dashed #bbb;
+  margin: 5px auto;
+  color: #555;
+  min-height: 86vh;
+  min-width: 98%;
+  overflow: auto;
+  cursor: pointer;
+}
+
+
+
+.ssi-header-logo {
+  float: right;
+  height: 18px;
+  margin-top: 4px;
+}
+
+.modal {
+  text-align: center;
+}
+
+@media screen and (min-width: 768px) {
+  .modal:before {
+    display: inline-block;
+    vertical-align: middle;
+    content: " ";
+    height: 100%;
+  }
+}
+
+.modal-dialog {
+  display: inline-block;
+  text-align: left;
+  vertical-align: middle;
+  overflow: hidden !important;
+}
+
+.navStyle {
+  height: 3em;
+  width: 4em !important;
+}
+
+.gridContainer {
+  background-color: #F4F4F4;
+  display: grid;
+  width: 96%;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+  grid-template-rows: repeat(1, 1fr) 1fr 1fr 1fr;
+  grid-auto-columns: 1fr;
+  grid-auto-rows: 1fr;
+  grid-gap: auto;
+  grid-auto-flow: column;
+  padding: auto;
+  padding-top: 4em;
+  justify-items: center; /* position: absolute; */ /*   left: 50%; */ /*   top: 50%; */ /*   transform: translate(-50%, -50%); */
+}
+
+.N6214 {
+  grid-area: 1 / 1 / span 1 / span 1;
+}
+.N6213 {
+  grid-area: 2 / 1 / span 1 / span 1;
+}
+.N6212 {
+  grid-area: 3 / 1 / span 1 / span 1;
+}
+.N6211 {
+  grid-area: 4 / 1 / span 1 / span 1;
+}
+.N6114 {
+  grid-area: 1 / 2 / span 1 / span 1;
+}
+.N6113 {
+  grid-area: 2 / 2 / span 1 / span 1;
+}
+.N6112 {
+  grid-area: 3 / 2 / span 1 / span 1;
+}
+.N6111 {
+  grid-area: 4 / 2 / span 1 / span 1;
+}
+.N5214 {
+  grid-area: 1 / 3 / span 1 / span 1;
+}
+.N5213 {
+  grid-area: 2 / 3 / span 1 / span 1;
+}
+.N5212 {
+  grid-area: 3 / 3 / span 1 / span 1;
+}
+.N5211 {
+  grid-area: 4 / 3 / span 1 / span 1;
+}
+.N5114 {
+  grid-area: 1 / 4 / span 1 / span 1;
+}
+.N5113 {
+  grid-area: 2 / 4 / span 1 / span 1;
+}
+.N5112 {
+  grid-area: 3 / 4 / span 1 / span 1;
+}
+.N5111 {
+  grid-area: 4 / 4 / span 1 / span 1;
+}
+.N4214 {
+  grid-area: 1 / 5 / span 1 / span 1;
+}
+.N4213 {
+  grid-area: 2 / 5 / span 1 / span 1;
+}
+.N4212 {
+  grid-area: 3 / 5 / span 1 / span 1;
+}
+.N4211 {
+  grid-area: 4 / 5 / span 1 / span 1;
+}
+.N4114 {
+  grid-area: 1 / 6 / span 1 / span 1;
+}
+.N4113 {
+  grid-area: 2 / 6 / span 1 / span 1;
+}
+.N4112 {
+  grid-area: 3 / 6 / span 1 / span 1;
+}
+.N4111 {
+  grid-area: 4 / 6 / span 1 / span 1;
+}
+.N3214 {
+  grid-area: 1 / 7 / span 1 / span 1;
+}
+.N3213 {
+  grid-area: 2 / 7 / span 1 / span 1;
+}
+.N3212 {
+  grid-area: 3 / 7 / span 1 / span 1;
+}
+.N3211 {
+  grid-area: 4 / 7 / span 1 / span 1;
+}
+.N3114 {
+  grid-area: 1 / 8 / span 1 / span 1;
+}
+.N3113 {
+  grid-area: 2 / 8 / span 1 / span 1;
+}
+.N3112 {
+  grid-area: 3 / 8 / span 1 / span 1;
+}
+.N3111 {
+  grid-area: 4 / 8 / span 1 / span 1;
+}
+.N2214 {
+  grid-area: 1 / 9 / span 1 / span 1;
+}
+.N2213 {
+  grid-area: 2 / 9 / span 1 / span 1;
+}
+.N2212 {
+  grid-area: 3 / 9 / span 1 / span 1;
+}
+.N2211 {
+  grid-area: 4 / 9 / span 1 / span 1;
+}
+.N2114 {
+  grid-area: 1 / 10 / span 1 / span 1;
+}
+.N2113 {
+  grid-area: 2 / 10 / span 1 / span 1;
+}
+.N2112 {
+  grid-area: 3 / 10 / span 1 / span 1;
+}
+.N2111 {
+  grid-area: 4 / 10 / span 1 / span 1;
+}
+.N1214 {
+  grid-area: 1 / 11 / span 1 / span 1;
+}
+.N1213 {
+  grid-area: 2 / 11 / span 1 / span 1;
+}
+.N1212 {
+  grid-area: 3 / 11 / span 1 / span 1;
+}
+.N1211 {
+  grid-area: 4 / 11 / span 1 / span 1;
+}
+.N1114 {
+  grid-area: 1 / 12 / span 1 / span 1;
+}
+.N1113 {
+  grid-area: 2 / 12 / span 1 / span 1;
+}
+.N1112 {
+  grid-area: 3 / 12 / span 1 / span 1;
+}
+.N1111 {
+  grid-area: 4 / 12 / span 1 / span 1;
+}
+
+
+#last-notes {
+  overflow-y: scroll;
+  height: 5em;
+}
+
+.change-date {
+  font-size: 18px;
+}
+
+table {
+  border-collapse: collapse;
+  border-style: hidden;
+}
+table td th{
+  border: 1.5px solid #EEE;
+}
+
+td {
+  margin-left: 2em;
+}
+
+th {
+  margin: auto;
+  padding: auto;
+  width: 10em;
+}
+
+.noselect{
+  -webkit-touch-callout: none !important; /* iOS Safari */
+  -webkit-user-select:   none !important; /* Safari */
+  -khtml-user-select:    none !important; /* Konqueror HTML */
+  -moz-user-select:      none !important; /* Old versions of Firefox */
+  -ms-user-select:       none !important; /* Internet Explorer/Edge */
+  -user-select:          none !important; /* Non-prefixed version, currently supported by Chrome, Opera and Firefox */
+}
