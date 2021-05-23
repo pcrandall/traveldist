@@ -25,19 +25,6 @@ type Config struct {
 
 func init() {
 
-	clear = make(map[string]func()) //Initialize it
-
-	clear["linux"] = func() {
-		cmd := exec.Command("clear") //Linux example, its tested
-		cmd.Stdout = os.Stdout
-		cmd.Run()
-	}
-	clear["windows"] = func() {
-		cmd := exec.Command("cmd", "/c", "cls") //Windows example, its tested
-		cmd.Stdout = os.Stdout
-		cmd.Run()
-	}
-
 	newpath := filepath.Join(".", "old")
 	if _, err = os.Stat(newpath); os.IsNotExist(err) {
 		os.MkdirAll(newpath, os.ModePerm)
@@ -53,7 +40,43 @@ func init() {
 		os.MkdirAll(dbpath, os.ModePerm)
 	}
 
+	resize = make(map[string]func())
+	clear = make(map[string]func()) //Initialize it
+
+	resize["darwin"] = func() {
+		cmd := exec.Command("resize -s 35 120")
+		cmd.Stdout = os.Stdout
+		cmd.Run()
+	}
+	resize["linux"] = func() {
+		cmd := exec.Command("resize -s 35 120")
+		cmd.Stdout = os.Stdout
+		cmd.Run()
+	}
+	resize["windows"] = func() {
+		cmd := exec.Command("cmd", "/c", "mode con:cols=120 lines=30") //Windows example, its tested
+		cmd.Stdout = os.Stdout
+		cmd.Run()
+	}
+
+	clear["darwin"] = func() {
+		cmd := exec.Command("clear") //Linux example, its tested
+		cmd.Stdout = os.Stdout
+		cmd.Run()
+	}
+	clear["linux"] = func() {
+		cmd := exec.Command("clear") //Linux example, its tested
+		cmd.Stdout = os.Stdout
+		cmd.Run()
+	}
+	clear["windows"] = func() {
+		cmd := exec.Command("cmd", "/c", "cls") //Windows example, its tested
+		cmd.Stdout = os.Stdout
+		cmd.Run()
+	}
+
 	GetConfig()
+
 }
 
 func GetConfig() {

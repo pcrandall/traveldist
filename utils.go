@@ -2,13 +2,25 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"runtime"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/fatih/color"
 	"github.com/pcrandall/figlet4go"
 )
+
+func checkErr(err error, str string) {
+	if err != nil {
+		if str != "" {
+			log.Println(str, err)
+		} else {
+			log.Println(err)
+		}
+	}
+}
 
 func callClear() {
 	value, ok := clear[runtime.GOOS] //runtime.GOOS -> linux, windows, darwin etc.
@@ -79,4 +91,9 @@ func printHeader(str string) {
 	fmt.Println(renderStr[:len(renderStr)-len(renderStr)/11*3-1])
 	// print the signature
 	fmt.Printf("%s%s\n", padding, signature)
+}
+
+func cleanString(str string) string {
+	// return strings.Join(strings.Fields(strings.TrimSpace(str)), " ")
+	return strings.TrimSpace(str)
 }

@@ -8,7 +8,12 @@ require (
 	github.com/charmbracelet/bubbletea v0.12.4
 	github.com/fatih/color v1.10.0
 	github.com/google/go-cmp v0.5.4 // indirect
+	github.com/kr/pretty v0.1.0 // indirect
+	github.com/mattn/go-sqlite3 v1.14.7
+	github.com/olekukonko/tablewriter v0.0.5
 	github.com/pcrandall/figlet4go v0.0.0-20210104123851-6934a7e049df
+	github.com/stretchr/testify v1.4.0 // indirect
 	github.com/theckman/yacspin v0.8.0
+	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 // indirect
 	gopkg.in/yaml.v2 v2.4.0
 )

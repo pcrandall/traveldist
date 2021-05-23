@@ -18,8 +18,13 @@ embed:
 
 run:
 	@echo "==> running travelDistance"
-	@go run *.go
+	@${currentDir}/scripts/run.sh
 .PHONY: run
+
+writeRun:
+	@echo "==> running travelDistance"
+	@${currentDir}/scripts/writeRun.sh
+.PHONY: writeRun
 
 ## @echo "OS not defined, Usage: make build windows"
 	#@./scripts/build.sh
