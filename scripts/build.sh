@@ -16,9 +16,13 @@ else
     # embed icon in the executable
     rsrc -ico assets/favicon.ico
     # build for windows
-    mkdir -p $releaseDir/config
+    mkdir -p $releaseDir/{config,db}
     GOOS=windows GOARCH=386 go build .
     cp -r config ${releaseDir}/
+    cp -r db ${releaseDir}/
     cp travelDist.exe ${releaseDir}/Travel\ Distances.exe
     rm travelDist.exe
+    cp -r ${releaseDir} /mnt/c/Users/Phillip.Crandall/Desktop/traveldist
+    cd /mnt/c/Users/Phillip.Crandall/Desktop/traveldist
+    explorer.exe .
 fi

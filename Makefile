@@ -16,22 +16,30 @@ embed:
 	@go-bindata -o config.go config
 .PHONY: embed
 
-run:
-	@echo "==> running travelDistance"
-	@${currentDir}/scripts/run.sh
-.PHONY: run
 
 writeRun:
 	@echo "==> running travelDistance"
 	@${currentDir}/scripts/writeRun.sh
 .PHONY: writeRun
 
-## @echo "OS not defined, Usage: make build windows"
-	#@./scripts/build.sh
+run:
+	@echo "==> running travelDistance"
+	@${currentDir}/scripts/run.sh
+.PHONY: run
 
 build:
 	@echo "==> building travelDistance"
 	@${currentDir}/scripts/build.sh
+.PHONY: build
+
+run:
+	@echo "==> running WINDOWS travelDistance"
+	@${currentDir}/scripts/run.bat
+.PHONY: run
+
+build:
+	@echo "==> building WINDOWS travelDistance"
+	@${currentDir}/scripts/build.bat
 .PHONY: build
 
 git:

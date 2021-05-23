@@ -1,9 +1,7 @@
 package main
 
 import (
-	"database/sql"
 	"flag"
-	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -132,6 +130,8 @@ func main() {
 	spinner.Stop() // connected stop spinner
 
 	RenderTable(tableString)
+
+	insertDatabase(tableString)
 	if writeFile {
 		oldFilename = writeFileName // store filename for comparison later
 		p := tea.NewProgram(initialModel())
@@ -152,43 +152,6 @@ func main() {
 			}
 		}
 	}
-}
-
-func database(query string) {
-	db, err := sql.Open("sqlite3", "db/data.db")
-	defer db.Close()
-	checkErr(err, "Error connecting to database")
-
-	db.Ping()
-	checkErr(err, "Error pinging database")
-
-	// statement, _ := db.Prepare("CREATE TABLE IF NOT EXISTS locations (id INTEGER PRIMARY KEY AUTOINCREMENT, location TEXT NOT NULL, description TEXT NOT NULL, area TEXT)")
-	// statement.Exec()
-
-	query = cleanString(fmt.Sprintf("%%%s%%", query))
-	rows, err := db.Query("SELECT location, description, area FROM locations WHERE location LIKE ?", query)
-
-	checkErr(err, "Database Query error:  "+query)
-
-	var location string
-	var description string
-	var area string
-	var table [][]string
-	for rows.Next() {
-		var val []string
-		rows.Scan(&location, &description, &area)
-		checkErr(err, "")
-
-		// fmt.Println("Location: ", location)
-		// fmt.Println("Description: ", description)
-		// fmt.Println("Area: ", area)
-
-		val = append(val, location)
-		val = append(val, description)
-		val = append(val, area)
-		table = append(table, val)
-	}
-
 }
 
 func RenderTable(locations []shuttleDistance) {

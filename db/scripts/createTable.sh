@@ -14,10 +14,10 @@ EOF
 
 sqlite3 ./traveldistances.db <<EOF
 CREATE TABLE "DISTANCES" (
-	"id"	INTEGER NOT NULL,
+	"id"	INTEGER,
 	"shuttle"	TEXT NOT NULL,
 	"distance"	INTEGER NOT NULL,
-	"timestamp"	TEXT NOT NULL,
+	"timestamp"	TEXT,
 	PRIMARY KEY("id" AUTOINCREMENT)
 );
 EOF
