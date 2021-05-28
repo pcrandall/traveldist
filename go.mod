@@ -8,6 +8,7 @@ require (
 	github.com/charmbracelet/bubbletea v0.12.4
 	github.com/fatih/color v1.10.0
 	github.com/google/go-cmp v0.5.4 // indirect
+	github.com/gorilla/mux v1.8.0
 	github.com/kr/pretty v0.1.0 // indirect
 	github.com/mattn/go-sqlite3 v1.14.7
 	github.com/olekukonko/tablewriter v0.0.5

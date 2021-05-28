@@ -24,9 +24,22 @@ type shuttleDistance struct {
 	timestamp string
 }
 
+type travelDistances struct {
+	t1_shuttle           string
+	t1_distance          int
+	t2_distance          int
+	shoe_travel_distance int
+	t1_timestamp         string
+	t2_timestamp         string
+	days_installed       string
+	notes                string
+}
+
 var (
-	tableString []shuttleDistance
-	client      = &http.Client{
+	tableString  []shuttleDistance
+	getDistances []travelDistances
+
+	client = &http.Client{
 		Timeout: 10 * time.Second,
 	}
 
@@ -53,12 +66,14 @@ var (
 	excelColumn   int
 	clear         map[string]func()
 	resize        map[string]func()
+	restAPI       bool
 )
 
 func main() {
 	printHeader("TRAVELDIST")
 
 	flag.BoolVar(&writeFile, "w", false, "Write to excel workbook -w=true")
+	flag.BoolVar(&restAPI, "r", false, "restAPI -r=true")
 	flag.Parse()
 
 	//Initialize
@@ -72,66 +87,74 @@ func main() {
 		findWorkbook()
 	}
 
-	spinner, err := yacspin.New(cfg) // handle the error
-	checkErr(err, "yacspin error: ")
-	spinner.Start() // Start the spinner
+	if restAPI == false {
+		spinner, err := yacspin.New(cfg) // handle the error
+		checkErr(err, "yacspin error: ")
+		spinner.Start() // Start the spinner
 
-	//TODO add channels here
-	navettes := config.Levels
-	for _, nav := range navettes {
-		// fmt.Printf("Floor: [%d]\n", val.Floor)
-		for _, n := range nav.Navette {
-			getNavette = n.Name
-			writeRows[n.Name] = n.Row
-			// fmt.Printf("Name: %s, IP: %s, Row: %s\n", v.Name, v.IP, v.Row)
-			res, err := client.Get("http://" + n.IP + "/srm1TravelDistanceList.html")
-			checkErr(err, "Navette:"+n.Name+"IP address:"+n.IP)
-			if err != nil {
-				continue
+		//TODO add channels here
+		navettes := config.Levels
+		for _, nav := range navettes {
+			// fmt.Printf("Floor: [%d]\n", val.Floor)
+			for _, n := range nav.Navette {
+				getNavette = n.Name
+				writeRows[n.Name] = n.Row
+				// fmt.Printf("Name: %s, IP: %s, Row: %s\n", v.Name, v.IP, v.Row)
+				res, err := client.Get("http://" + n.IP + "/srm1TravelDistanceList.html")
+				checkErr(err, "Navette:"+n.Name+"IP address:"+n.IP)
+				if err != nil {
+					continue
+				}
+
+				body, err := ioutil.ReadAll(res.Body)
+				checkErr(err, "Navette:"+n.Name+"IP address:"+n.IP)
+				if err != nil {
+					continue
+				}
+				pageContent := string(body)
+
+				// parse the page content and pull the relevant values
+				row := new(shuttleDistance)
+				date := regexp.MustCompile(`(\d{4}-\d{2}-\d{2})[\s\d:]{13}`)
+				//<td>I</td><td>2020-09-02 15:16:15:415</td><td id="desc"></td><td>TD Total: 4598010 4598010 </td><td>Td: 0 4598010 </td></td> err <nil>
+				// date returns 2020-09-02 15:16:15:415 from the above
+				dateMatchAll := date.FindAllStringSubmatch(pageContent, -1)
+				lastDate := dateMatchAll[len(dateMatchAll)-1][0]
+				log.Println(n.Name, lastDate)
+
+				r := regexp.MustCompile(`Total:[\d\s]{9}`)
+				// give me all the matches
+				submatchall := r.FindAllStringSubmatch(pageContent, -1)
+				total := submatchall[len(submatchall)-1][0]
+				//<td>I</td><td>2020-09-02 15:16:15:415</td><td id="desc"></td><td>TD Total: 4598010 4598010 </td><td>Td: 0 4598010 </td></td> err <nil>
+				//total looks like this now Total: 2912046
+				/// total[7:] to trim the string
+				row.shuttle = cleanString(n.Name)
+				row.timestamp = cleanString(lastDate)
+				row.distance = total[7:]
+				tableString = append(tableString, *row)
+
+				if writeFile {
+					excelRow, _ := strconv.Atoi(n.Row)
+					writeCoord := buildCoordinate(excelColumn, excelRow)
+					excelFile.SetCellValue(config.SheetName, writeCoord, total[0])
+				}
+				defer res.Body.Close()
 			}
-
-			body, err := ioutil.ReadAll(res.Body)
-			checkErr(err, "Navette:"+n.Name+"IP address:"+n.IP)
-			if err != nil {
-				continue
-			}
-			pageContent := string(body)
-
-			// parse the page content and pull the relevant values
-			row := new(shuttleDistance)
-			date := regexp.MustCompile(`(\d{4}-\d{2}-\d{2})[\s\d:]{13}`)
-			//<td>I</td><td>2020-09-02 15:16:15:415</td><td id="desc"></td><td>TD Total: 4598010 4598010 </td><td>Td: 0 4598010 </td></td> err <nil>
-			// date returns 2020-09-02 15:16:15:415 from the above
-			dateMatchAll := date.FindAllStringSubmatch(pageContent, -1)
-			lastDate := dateMatchAll[len(dateMatchAll)-1][0]
-			log.Println(n.Name, lastDate)
-
-			r := regexp.MustCompile(`Total:[\d\s]{9}`)
-			// give me all the matches
-			submatchall := r.FindAllStringSubmatch(pageContent, -1)
-			total := submatchall[len(submatchall)-1][0]
-			//<td>I</td><td>2020-09-02 15:16:15:415</td><td id="desc"></td><td>TD Total: 4598010 4598010 </td><td>Td: 0 4598010 </td></td> err <nil>
-			//total looks like this now Total: 2912046
-			/// total[7:] to trim the string
-			row.shuttle = cleanString(n.Name)
-			row.timestamp = cleanString(lastDate)
-			row.distance = total[7:]
-			tableString = append(tableString, *row)
-
-			if writeFile {
-				excelRow, _ := strconv.Atoi(n.Row)
-				writeCoord := buildCoordinate(excelColumn, excelRow)
-				excelFile.SetCellValue(config.SheetName, writeCoord, total[0])
-			}
-			defer res.Body.Close()
 		}
+
+		spinner.Stop() // connected stop spinner
+
 	}
 
-	spinner.Stop() // connected stop spinner
+	//TODO
+	if restAPI == false {
+		RenderTable(tableString)
+		insertDatabase(tableString)
+	} else {
+		router()
+	}
 
-	RenderTable(tableString)
-
-	insertDatabase(tableString)
 	if writeFile {
 		oldFilename = writeFileName // store filename for comparison later
 		p := tea.NewProgram(initialModel())
@@ -152,6 +175,7 @@ func main() {
 			}
 		}
 	}
+
 }
 
 func RenderTable(locations []shuttleDistance) {
