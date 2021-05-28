@@ -106,15 +106,15 @@ func main() {
 			lastDate := dateMatchAll[len(dateMatchAll)-1][0]
 			log.Println(n.Name, lastDate)
 
-			r := regexp.MustCompile(`Total:[\d\s]{8}`)
+			r := regexp.MustCompile(`Total:[\d\s]{9}`)
 			// give me all the matches
 			submatchall := r.FindAllStringSubmatch(pageContent, -1)
 			total := submatchall[len(submatchall)-1][0]
 			//<td>I</td><td>2020-09-02 15:16:15:415</td><td id="desc"></td><td>TD Total: 4598010 4598010 </td><td>Td: 0 4598010 </td></td> err <nil>
 			//total looks like this now Total: 2912046
 			/// total[7:] to trim the string
-			row.shuttle = n.Name
-			row.timestamp = lastDate
+			row.shuttle = cleanString(n.Name)
+			row.timestamp = cleanString(lastDate)
 			row.distance = total[7:]
 			tableString = append(tableString, *row)
 

@@ -21,7 +21,7 @@ func insertDatabase(val []shuttleDistance) {
 
 		stmt, err := db.Prepare("INSERT INTO DISTANCES(shuttle, distance, timestamp) VALUES(?,?,?);")
 		checkErr(err, "Error preparing DB")
-		dist, err := strconv.Atoi(row.distance)
+		dist, err := strconv.Atoi(cleanString(row.distance))
 		checkErr(err, "Error converting distance to int")
 
 		res, err := stmt.Exec(&row.shuttle, &dist, &row.timestamp)

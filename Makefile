@@ -34,12 +34,12 @@ build:
 
 run:
 	@echo "==> running WINDOWS travelDistance"
-	@${currentDir}/scripts/run.bat
+	@${currentDir}/scripts/runWindows.bat
 .PHONY: run
 
 build:
 	@echo "==> building WINDOWS travelDistance"
-	@${currentDir}/scripts/build.bat
+	@${currentDir}/scripts/buildWindows.bat
 .PHONY: build
 
 git:
