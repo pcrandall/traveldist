@@ -39,7 +39,10 @@ runWindows:
 
 runWindowsRest:
 	@echo "==> running WINDOWS REST travelDistance"
-	@${currentDir}/scripts/windows/runWindowsRest.bat
+	@set GOARCH=386
+	@set GOOS=windows
+	@set CGO_ENABLED=1
+	@go run . -r
 .PHONY: runWindowsRest
 
 buildWindows:
