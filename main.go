@@ -36,8 +36,8 @@ type travelDistances struct {
 }
 
 var (
-	tableString  []shuttleDistance
-	getDistances []travelDistances
+	tableString        []shuttleDistance
+	getTravelDistances []travelDistances
 
 	client = &http.Client{
 		Timeout: 10 * time.Second,
