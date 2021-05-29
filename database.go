@@ -99,13 +99,13 @@ func getDists(w http.ResponseWriter, r *http.Request) {
 	// var notes, days_installed, t1_shuttle, t1_timestamp, t2_timestamp string
 
 	for rows.Next() {
-		var dist travelDistances
+		dist := new(travelDistances)
 		// rows.Scan(&t1_shuttle, &t1_distance, &t2_distance, &shoe_travel_difference, &t1_timestamp, &t2_timestamp, &days_installed, &notes)
 		rows.Scan(&dist.t1_shuttle, &dist.t1_distance, &dist.t2_distance, &dist.shoe_travel_distance, &dist.t1_timestamp, &dist.t2_timestamp, &dist.days_installed, &dist.notes)
 		checkErr(err, "")
 		log.Println("t1_shuttle: ", dist.t1_shuttle, "t1_distance: ", dist.t1_distance, "t2_distance: ", dist.t2_distance, "shoe_travel_difference: ", dist.shoe_travel_distance, "t1_timestamp: ", dist.t1_timestamp, "t2_timestamp: ", dist.t2_timestamp, "days_installed: ", dist.days_installed, "notes: ", dist.notes)
 		fmt.Println("t1_shuttle: ", dist.t1_shuttle, "t1_distance: ", dist.t1_distance, "t2_distance: ", dist.t2_distance, "shoe_travel_difference: ", dist.shoe_travel_distance, "t1_timestamp: ", dist.t1_timestamp, "t2_timestamp: ", dist.t2_timestamp, "days_installed: ", dist.days_installed, "notes: ", dist.notes)
-		getDistances = append(getDistances, dist)
+		getDistances = append(getDistances, *dist)
 		// fmt.Println("ID: ", id, "Shuttle: ", shuttle, "Distance: ", distance, "Timestamp: ", timestamp)
 
 		// 			row := new(travelDistances)
