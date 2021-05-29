@@ -13,6 +13,7 @@ require (
 	github.com/mattn/go-sqlite3 v1.14.7
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/pcrandall/figlet4go v0.0.0-20210104123851-6934a7e049df
+	github.com/rs/cors v1.7.0
 	github.com/stretchr/testify v1.4.0 // indirect
 	github.com/theckman/yacspin v0.8.0
 	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 // indirect
