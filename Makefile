@@ -19,28 +19,33 @@ embed:
 
 writeRun:
 	@echo "==> running travelDistance"
-	@${currentDir}/scripts/writeRun.sh
+	@${currentDir}/scripts/unix/writeRun.sh
 .PHONY: writeRun
 
 run:
 	@echo "==> running travelDistance"
-	@${currentDir}/scripts/run.sh
+	@${currentDir}/scripts/unix/run.sh
 .PHONY: run
 
 build:
 	@echo "==> building travelDistance"
-	@${currentDir}/scripts/build.sh
+	@${currentDir}/scripts/unix/build.sh
 .PHONY: build
 
-run:
+runWindows:
 	@echo "==> running WINDOWS travelDistance"
-	@${currentDir}/scripts/runWindows.bat
-.PHONY: run
+	@${currentDir}/scripts/windows/runWindows.bat
+.PHONY: runWindows
 
-build:
+runWindowsRest:
+	@echo "==> running WINDOWS REST travelDistance"
+	@${currentDir}/scripts/windows/runWindowsRest.bat
+.PHONY: runWindowsRest
+
+buildWindows:
 	@echo "==> building WINDOWS travelDistance"
-	@${currentDir}/scripts/buildWindows.bat
-.PHONY: build
+	@${currentDir}/scripts/windows/buildWindows.bat
+.PHONY: buildWindows
 
 git:
 	@git add -u
