@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"strconv"
 
@@ -68,25 +67,35 @@ func router() {
 }
 
 func getDists(w http.ResponseWriter, r *http.Request) {
+
 	w.Header().Set("Content-Type", "application/json")
 
-	db, err := sql.Open("sqlite3", "db/traveldistances.db")
-	defer db.Close()
-	checkErr(err, "Error connecting to database")
+	keys := make(map[string]travelDistances)
 
-	rows, err := db.Query(`SELECT * FROM shoe_travel;`)
+	q := `SELECT * FROM shoe_travel;`
+	db, err := sql.Open("sqlite3", "db/traveldistances.db")
+	checkErr(err, "Error connecting to database")
+	db.Ping()
+	checkErr(err, "Error pinging database")
+	defer db.Close()
+
+	rows, err := db.Query(q)
 	checkErr(err, "Database Query error:  ")
 
 	for rows.Next() {
 		var dist travelDistances
-		rows.Scan(dist.t1_shuttle, dist.t1_distance, dist.t2_distance, dist.shoe_travel_distance, dist.t1_timestamp, dist.t2_timestamp, dist.days_installed, dist.notes)
+		// rows.Scan(&t1_shuttle, &t1_distance, &t2_distance, &shoe_travel_difference, &t1_timestamp, &t2_timestamp, &days_installed, &notes)
+		rows.Scan(&dist.T1_shuttle, &dist.T1_distance, &dist.T2_distance, &dist.Shoe_travel_distance, &dist.T1_timestamp, &dist.T2_timestamp, &dist.Days_installed, &dist.Notes)
 		checkErr(err, "")
-		log.Println("t1_shuttle: ", dist.t1_shuttle, "t1_distance: ", dist.t1_distance, "t2_distance: ", dist.t2_distance, "shoe_travel_difference: ", dist.shoe_travel_distance, "t1_timestamp: ", dist.t1_timestamp, "t2_timestamp: ", dist.t2_timestamp, "days_installed: ", dist.days_installed, "notes: ", dist.notes)
-		fmt.Println("t1_shuttle: ", dist.t1_shuttle, "t1_distance: ", dist.t1_distance, "t2_distance: ", dist.t2_distance, "shoe_travel_difference: ", dist.shoe_travel_distance, "t1_timestamp: ", dist.t1_timestamp, "t2_timestamp: ", dist.t2_timestamp, "days_installed: ", dist.days_installed, "notes: ", dist.notes)
-		getTravelDistances = append(getTravelDistances, dist)
+		// log.Println("t1_shuttle: ", dist.t1_shuttle, "t1_distance: ", dist.t1_distance, "t2_distance: ", dist.t2_distance, "shoe_travel_difference: ", dist.shoe_travel_distance, "t1_timestamp: ", dist.t1_timestamp, "t2_timestamp: ", dist.t2_timestamp, "days_installed: ", dist.days_installed, "notes: ", dist.notes)
+		// fmt.Println("t1_shuttle: ", dist.t1_shuttle, "t1_distance: ", dist.t1_distance, "t2_distance: ", dist.t2_distance, "shoe_travel_difference: ", dist.shoe_travel_distance, "t1_timestamp: ", dist.t1_timestamp, "t2_timestamp: ", dist.t2_timestamp, "days_installed: ", dist.days_installed, "notes: ", dist.notes)
+		checkErr(err, "")
+		keys[dist.T1_shuttle] = dist
 	}
 
-	json.NewEncoder(w).Encode(getTravelDistances)
+	fmt.Printf("KEYS: %#v", keys)
+
+	json.NewEncoder(w).Encode(&keys)
 	checkErr(err, "JSON encoding error")
 
 }

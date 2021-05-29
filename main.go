@@ -25,14 +25,14 @@ type shuttleDistance struct {
 }
 
 type travelDistances struct {
-	t1_shuttle           string
-	t1_distance          int
-	t2_distance          int
-	shoe_travel_distance int
-	t1_timestamp         string
-	t2_timestamp         string
-	days_installed       string
-	notes                string
+	T1_shuttle           string
+	T1_distance          int
+	T2_distance          int
+	Shoe_travel_distance int
+	T1_timestamp         string
+	T2_timestamp         string
+	Days_installed       string
+	Notes                string
 }
 
 var (
