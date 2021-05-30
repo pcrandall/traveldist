@@ -7,14 +7,11 @@ import (
 	"net/http"
 	"os"
 	"regexp"
-	"strconv"
 	"time"
 
-	"github.com/360EntSecGroup-Skylar/excelize"
-	tea "github.com/charmbracelet/bubbletea"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/olekukonko/tablewriter"
-	"github.com/theckman/yacspin"
+	"github.com/pcrandall/travelDist/workbook"
 	// frames "github.com/pcrandall/mfsplaces/frames"
 )
 
@@ -26,62 +23,40 @@ var (
 		Timeout: 10 * time.Second,
 	}
 
-	cfg = yacspin.Config{
-		Frequency:       200 * time.Millisecond,
-		CharSet:         yacspin.CharSets[32],
-		Suffix:          "Getting Travel Distances",
-		SuffixAutoColon: false,
-		Message:         getNavette,
-		StopCharacter:   "√",
-		StopMessage:     " Completed!",
-		StopColors:      []string{"fgGreen"},
-		Colors:          []string{"fgCyan"},
-	}
-
-	config        *Config
-	err           error
-	excelFile     *excelize.File
-	getNavette    string
-	oldFilename   string
-	writeFile     bool
-	writeFileName string
-	writeRows     map[string]string
-	excelColumn   int
-	clear         map[string]func()
-	resize        map[string]func()
-	restAPI       bool
+	config     *Config
+	err        error
+	getNavette string
+	writeFile  bool
+	clear      map[string]func()
+	resize     map[string]func()
+	restAPI    bool
 )
 
 func main() {
-	printHeader("TRAVELDIST")
-
 	flag.BoolVar(&writeFile, "w", false, "Write to excel workbook -w=true")
 	flag.BoolVar(&restAPI, "r", false, "restAPI -r=true")
 	flag.Parse()
 
+	callResize()
+	printHeader("TRAVELDIST")
+
 	//Initialize
-	writeRows = make(map[string]string)
 	logfile, err := os.OpenFile("./logs/logfile.txt", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 	checkErr(err, "Error Creating logfile.txt")
 	log.SetOutput(logfile)
 	defer logfile.Close()
 
 	if writeFile {
-		findWorkbook()
+		workbook.FindWorkbook(config.SheetName)
 	}
 
 	if restAPI == false {
-		spinner, err := yacspin.New(cfg) // handle the error
-		checkErr(err, "yacspin error: ")
-		spinner.Start() // Start the spinner
-
 		//TODO add channels here
 		navettes := config.Levels
 		for _, nav := range navettes {
 			// fmt.Printf("Floor: [%d]\n", val.Floor)
 			for _, n := range nav.Navette {
 				getNavette = n.Name
-				writeRows[n.Name] = n.Row
 				// fmt.Printf("Name: %s, IP: %s, Row: %s\n", v.Name, v.IP, v.Row)
 				res, err := client.Get("http://" + n.IP + "/srm1TravelDistanceList.html")
 				checkErr(err, "Navette:"+n.Name+"IP address:"+n.IP)
@@ -118,16 +93,16 @@ func main() {
 				tableString = append(tableString, *row)
 
 				if writeFile {
-					excelRow, _ := strconv.Atoi(n.Row)
-					writeCoord := buildCoordinate(excelColumn, excelRow)
-					excelFile.SetCellValue(config.SheetName, writeCoord, total[0])
+					workbook.WriteFile(n.Row, config.SheetName, total[0])
 				}
 				defer res.Body.Close()
 			}
 		}
 
-		spinner.Stop() // connected stop spinner
+	}
 
+	if writeFile {
+		workbook.SaveFile()
 	}
 
 	//TODO
@@ -135,30 +110,8 @@ func main() {
 		RenderTable(tableString)
 		insertDatabase(tableString)
 	} else {
-		router()
+		DBRouter()
 	}
-
-	if writeFile {
-		oldFilename = writeFileName // store filename for comparison later
-		p := tea.NewProgram(initialModel())
-		if err := p.Start(); err != nil {
-			log.Panic(err)
-		}
-
-		if writeFileName == "" { // check that the new filename is not empty, if so use old filename
-			if err := excelFile.SaveAs(oldFilename); err != nil {
-				log.Panic(err)
-			}
-		} else {
-			if err := excelFile.SaveAs(writeFileName); err != nil { // renamed file delete old file
-				log.Panic(err)
-			}
-			if err = os.Remove(oldFilename); err != nil {
-				log.Panic(err)
-			}
-		}
-	}
-
 }
 
 func RenderTable(locations []shuttleDistance) {

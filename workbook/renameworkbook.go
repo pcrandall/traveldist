@@ -1,7 +1,4 @@
-package main
-
-// A simple program demonstrating the text input component from the Bubbles
-// component library.
+package workbook
 
 import (
 	"fmt"

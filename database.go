@@ -14,17 +14,14 @@ import (
 
 func insertDatabase(val []shuttleDistance) {
 	db, err := sql.Open("sqlite3", "db/traveldistances.db")
-	defer db.Close()
 	checkErr(err, "Error connecting to database")
-
 	db.Ping()
 	checkErr(err, "Error pinging database")
+	defer db.Close()
 
 	// insert
 	for _, row := range val {
-
-		fmt.Printf("ROW VALUES: %#v\tROW TYPES: %T", row, row)
-
+		// fmt.Printf("ROW VALUES: %#v\tROW TYPES: %T", row, row)
 		stmt, err := db.Prepare("INSERT INTO DISTANCES(shuttle, distance, timestamp) VALUES(?,?,?);")
 		checkErr(err, "Error preparing DB")
 		dist, err := strconv.Atoi(cleanString(row.distance))
@@ -36,42 +33,23 @@ func insertDatabase(val []shuttleDistance) {
 		id, err := res.LastInsertId()
 		checkErr(err, "Error getting last id")
 
-		fmt.Println("Last InsertID: ", id)
-	}
-
-	// statement, _ := db.Prepare("CREATE TABLE IF NOT EXISTS locations (id INTEGER PRIMARY KEY AUTOINCREMENT, location TEXT NOT NULL, description TEXT NOT NULL, area TEXT)")
-	// statement.Exec()
-	// query = cleanString(fmt.Sprintf("%%%s%%", query))
-	rows, err := db.Query("SELECT * FROM DISTANCES")
-	checkErr(err, "Database Query error:  ")
-	var id, distance int
-	var shuttle, timestamp string
-
-	for rows.Next() {
-		rows.Scan(&id, &shuttle, &distance, &timestamp)
-		checkErr(err, "")
-		fmt.Println("ID: ", id, "Shuttle: ", shuttle, "Distance: ", distance, "Timestamp: ", timestamp)
-
+		log.Println("Last InsertID: ", id)
 	}
 }
 
-func router() {
-
-	fmt.Println("Settin up server, enabling CORS . . .")
-
+func DBRouter() {
 	c := cors.New(cors.Options{
-		AllowedOrigins: []string{"*"},   // All origins
-		AllowedMethods: []string{"GET"}, // Allowing only get, just an example
+		AllowedOrigins: []string{"*"},          // All origins
+		AllowedMethods: []string{"GET", "PUT"}, // Allowing only get, just an example
 	})
-
 	router := mux.NewRouter()
 	router.HandleFunc("/dists", getDists).Methods("GET") // get all the distances from db
 	// router.HandleFunc("/dist", createDist).Methods("POST")
 	// router.HandleFunc("/dist/{id}", getDist).Methods("GET")
 	// router.HandleFunc("/dist/{id}", updateDist).Methods("PUT")
 	// router.HandleFunc("/dist/{id}", deleteDist).Methods("DELETE")
-	log.Fatal(http.ListenAndServe(":8001", c.Handler(router)))
 	fmt.Println("Server is ready and is listening at port :8001 . . .")
+	log.Fatal(http.ListenAndServe(":8001", c.Handler(router)))
 }
 
 func getDists(w http.ResponseWriter, r *http.Request) {

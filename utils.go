@@ -31,6 +31,15 @@ func callClear() {
 	}
 }
 
+func callResize() {
+	value, ok := resize[runtime.GOOS] //runtime.GOOS -> linux, windows, darwin etc.
+	if ok {                           //if we defined a clear func for that platform:
+		value() //we execute it
+	} else { //unsupported platform
+		panic("Your platform is unsupported! I can't clear terminal screen :(")
+	}
+}
+
 func printHeader(str string) {
 	callClear()
 	t := time.Now()
