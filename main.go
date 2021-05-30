@@ -18,23 +18,6 @@ import (
 	// frames "github.com/pcrandall/mfsplaces/frames"
 )
 
-type shuttleDistance struct {
-	shuttle   string
-	distance  string
-	timestamp string
-}
-
-type travelDistances struct {
-	T1_shuttle           string
-	T1_distance          int
-	T2_distance          int
-	Shoe_travel_distance int
-	T1_timestamp         string
-	T2_timestamp         string
-	Days_installed       string
-	Notes                string
-}
-
 var (
 	tableString        []shuttleDistance
 	getTravelDistances []travelDistances

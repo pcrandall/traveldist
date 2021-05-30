@@ -7,7 +7,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
   font-family: Arial, Helvetica, sans-serif;
   line-height: 1;
-  background: #EAEAEA !important;
+  background: #eaeaea !important;
   height: 100%;
   margin: 0.5em;
   font: "Segoe UI", Arial, Helvetica, sans-serif;
@@ -57,8 +57,6 @@ code {
   cursor: pointer;
 }
 
-
-
 .ssi-header-logo {
   float: right;
   height: 18px;
@@ -91,7 +89,7 @@ code {
 }
 
 .gridContainer {
-  background-color: #F4F4F4;
+  background-color: #f4f4f4;
   display: grid;
   width: 96%;
   grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
@@ -250,7 +248,6 @@ code {
   grid-area: 4 / 12 / span 1 / span 1;
 }
 
-
 #last-notes {
   overflow-y: scroll;
   height: 5em;
@@ -264,8 +261,8 @@ table {
   border-collapse: collapse;
   border-style: hidden;
 }
-table td th{
-  border: 1.5px solid #EEE;
+table td th {
+  border: 1.5px solid #eee;
 }
 
 td {
@@ -278,11 +275,12 @@ th {
   width: 10em;
 }
 
-.noselect{
+.noselect {
   -webkit-touch-callout: none !important; /* iOS Safari */
-  -webkit-user-select:   none !important; /* Safari */
-  -khtml-user-select:    none !important; /* Konqueror HTML */
-  -moz-user-select:      none !important; /* Old versions of Firefox */
-  -ms-user-select:       none !important; /* Internet Explorer/Edge */
-  -user-select:          none !important; /* Non-prefixed version, currently supported by Chrome, Opera and Firefox */
+  -webkit-user-select: none !important; /* Safari */
+  -khtml-user-select: none !important; /* Konqueror HTML */
+  -moz-user-select: none !important; /* Old versions of Firefox */
+  -ms-user-select: none !important; /* Internet Explorer/Edge */
+  -user-select: none !important; /* Non-prefixed version, currently supported by Chrome, Opera and Firefox */
 }
+

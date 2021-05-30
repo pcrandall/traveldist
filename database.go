@@ -80,22 +80,18 @@ func getDists(w http.ResponseWriter, r *http.Request) {
 	checkErr(err, "Error connecting to database")
 	defer db.Close()
 
-	rows, err := db.Query(`SELECT * FROM shoe_travel;`)
+	rows, err := db.Query(`SELECT * FROM clean_shoe_travel;`)
 	checkErr(err, "Database Query error:  ")
 
-	keys := make(map[string]travelDistances)
-	// var keys []travelDistances
+	keys := make(map[string]cleanTravelDistances)
 	for rows.Next() {
-		var dist travelDistances
-		rows.Scan(&dist.T1_shuttle, &dist.T1_distance, &dist.T2_distance, &dist.Shoe_travel_distance, &dist.T1_timestamp, &dist.T2_timestamp, &dist.Days_installed, &dist.Notes)
+		var dist cleanTravelDistances
+		rows.Scan(&dist.Shuttle, &dist.Last_Updated, &dist.Shoe_Travel, &dist.Days_Installed, &dist.Shoes_Last_Distance, &dist.Shoes_Change_Distance, &dist.Shoes_Last_Changed, &dist.Notes)
 		checkErr(err, "")
-		// log.Println("t1_shuttle: ", dist.t1_shuttle, "t1_distance: ", dist.t1_distance, "t2_distance: ", dist.t2_distance, "shoe_travel_difference: ", dist.shoe_travel_distance, "t1_timestamp: ", dist.t1_timestamp, "t2_timestamp: ", dist.t2_timestamp, "days_installed: ", dist.days_installed, "notes: ", dist.notes)
-		// fmt.Println("t1_shuttle: ", dist.t1_shuttle, "t1_distance: ", dist.t1_distance, "t2_distance: ", dist.t2_distance, "shoe_travel_difference: ", dist.shoe_travel_distance, "t1_timestamp: ", dist.t1_timestamp, "t2_timestamp: ", dist.t2_timestamp, "days_installed: ", dist.days_installed, "notes: ", dist.notes)
-		keys[dist.T1_shuttle] = dist
-		// keys = append(keys, dist)
+		keys[dist.Shuttle] = dist
 	}
 
-	log.Printf("KEYS: %#v", keys)
+	log.Printf("KEYS: %#v\n\n", keys)
 	json.NewEncoder(w).Encode(&keys)
 	checkErr(err, "JSON encoding error")
 }

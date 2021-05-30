@@ -30,14 +30,61 @@
     <link href="/lib/duet/default.css" rel="stylesheet" />
     <script type="text/javascript" src="/js/jquery-3.3.1.js"></script>
     <script type="text/javascript" src="/js/bootstrap-3.3.7.min.js"></script>
-    <!-- <!-1- get the datepicker selected value -1-> -->
-    <!-- <script> -->
-    <!--     const picker = document.querySelector("duet-date-picker"); -->
-    <!--     const output = document.querySelector("output"); -->
-    <!--     picker.addEventListener("duetChange", function (event) { -->
-    <!--       output.innerHTML = event.detail.valueAsDate; -->
-    <!--     }); -->
-    <!-- </script> -->
+    <style>
+      body {
+        padding-right: 0px !important;
+        margin-right: 0px !important;
+      }
+
+      body.modal-open {
+        overflow: auto;
+      }
+
+      #notes-text-container {
+        overflow: hidden;
+        background-clip: padding-box;
+      }
+
+      #change-notes {
+        height: 5em;
+        border-radius: 4px;
+        overflow-y: visible !important;
+      }
+
+      .form-control,
+      #footer,
+      #last-notes {
+        scrollbar-width: thin;
+        !important scrollbar-gutter: [ auto | [ stable | always] && both? && force?]
+      }
+
+      #footer {
+        overflow-x: hidden;
+        overflow-y: visible !important;
+      }
+
+      #footer {
+        max-height: 150px;
+        overflow-y: auto;
+      }
+
+      ::-webkit-scrollbar {
+        height: 6px;
+        width: 6px;
+        background: #DDD;
+      }
+
+      ::-webkit-scrollbar-thumb {
+        background: #F0F0F0;
+        -webkit-border-radius: 6px;
+        -webkit-box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.75);
+      }
+
+      ::-webkit-scrollbar-corner {
+        background: #DDD;
+      }
+
+    </style>
     <!-- document ready -->
     <script>
       var shoeData;
@@ -54,7 +101,7 @@
             const n = Object.entries(navButtons)
             n.forEach(([key, value]) => {
               if (value.id !== undefined) {
-                let dist = shoeData[value.id].Shoe_travel_distance
+                let dist = shoeData[value.id].Shoe_Travel
                 $("#" + value.id).text(dist)
                 if (dist >= 1500) {
                   $("#" + value.id).removeClass("btn-success")
@@ -66,15 +113,18 @@
         <!-- navette buttons send data to modal form -->
         $("#distanceContainer").on("click", "button", function (e) {
           var myid = this.id;
-          $("#shoes-last-title").text("Last Changed Values")
           $("#shoes-title").text(myid + " Collector Shoe Change")
-          $('#last-distance').text(shoeData[myid].T2_distance)
-          $('#last-date').text(shoeData[myid].T2_timestamp)
-          $("#last-notes").text("REPLACED BY: " + "\tMEASUREMENT: " + "\tOTHER NOTES: ");
-          <!-- update last notes text -->
-          <!-- $("#lastNotes").text("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."); -->
-          <!-- console.log({ e }); -->
-          <!-- console.log(this.id); -->
+          $("#current-distance").text(shoeData[myid].Shoes_Last_Distance)
+          $("#last-updated").text(shoeData[myid].Last_Updated)
+          $("#last-distance").text(shoeData[myid].Shoes_Change_Distance)
+          $("#last-date").text(shoeData[myid].Shoes_Last_Changed)
+          $("#change-notes").val(
+            "Performed By: \nShoe Distance(km): \nShoe Measurement: \nOther Notes: "
+          )
+          $("#days-installed").text(shoeData[myid].Days_Installed ===
+            "" ? "0" : shoeData[myid].Days_Installed)
+          $("#shoe-travel").text(shoeData[myid].Shoe_Travel + " km");
+          $("#last-notes").text(shoeData[myid].Notes);
         });
         const navDiv = $('[id$=div]');
         const d = Object.entries(navDiv)
@@ -85,30 +135,15 @@
             $("#" + value.id).text(name)
           }
         });
+        $('#shoesModal').on('hidden.bs.modal', function (e) {
+          $(this).find("input,select").val('').end().find(
+            "input[type=checkbox], input[type=radio]").prop("checked",
+            "").end();
+          $("#change-notes").val(
+            "Performed By: \nShoe Distance(km): \nShoe Measurement: \nOther Notes: "
+          )
+        })
       });
-
-    </script>
-    <!-- modal clears the form when hidden-->
-    <script>
-      $("#shoesModal").on('hidden.bs.modal', function () {
-        $(this).find('form')[0].reset();
-      });
-
-    </script>
-    <!-- stop modal scrolling -->
-    <script>
-      $("#shoesModal").on("show", function () {
-        $("body").addClass("modal-open");
-      }).on("hidden", function () {
-        $("body").removeClass("modal-open")
-      });
-
-    </script>
-    <!-- getRandomInt -->
-    <script>
-      function getRandomInt(max) {
-        return Math.floor(Math.random() * max);
-      }
 
     </script>
   </head>
@@ -277,49 +312,68 @@
             style="margin-bottom: 0.15em; font-size: 24px;"></div>
           </div>
           <div class="modal-body">
-            <form>
-              <!-- modal shoes change -->
+            <form id="change-form">
               <!-- datepicker -->
               <div class="form-group noselect">
-                <label for="change-date" class="col-form-label noselect">Change Date:</label>
+                <label for="change-date" class="col-form-label noselect">Date:</label>
                 <duet-date-picker id="change-date" identifier="date"></duet-date-picker>
               </div>
               <!-- distance update -->
               <div class="form-group">
-                <label for="distance" class="col-form-label noselect">Change Distance:</label>
-                <input style="padding:14px 60px 14px 14px !important;"
-                type="text" class="form-control" id="recipient-name" placeholder=" Enter Distance: 0 - 25000000"
+                <label for="distance" class="col-form-label noselect">Distance:</label>
+                <input style="height: 3.2em; font-size: 16px; !important"
+                type="text" class="form-control" id="change-distance" placeholder=" Enter Distance: 0 - 25000000"
                 /> </div>
               <!-- notes -->
-              <div class="form-group">
-                <label for="notes-text" class="col-form-label noselect">Change Notes:</label>
-                <textarea style="resize: none;" class="form-control"
-                id="notes-text" placeholder="Enter Notes Here:"></textarea>
+              <div id="notes-text-container" class="form-group">
+                <label for="notes-text" class="col-form-label noselect">Notes:</label>
+                <textarea style="resize: none; white-space: pre-wrap;"
+                class="form-control" id="change-notes" placeholder="Enter Notes Here:"></textarea>
               </div>
             </form>
-            <div id="shoes-last-title" style="margin-bottom: 0.15em; font-size: 24px;"
-            class="modal-title"></div>
-            <table class="table">
-              <tbody>
-                <tr>
-                  <th class="noselect" scope="row">Date</th>
-                  <td id="last-date"></td>
-                </tr>
-                <tr>
-                  <th class="noselect" scope="row">Distance</th>
-                  <td id="last-distance"></td>
-                </tr>
-                <tr>
-                  <th class="noselect" scope="row">Notes</th>
-                  <td>
-                    <p id="last-notes"></p>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+            <div class="modal-footer" style="border: none; !important">
+              <button type="button" class="btn btn-primary" data-dismiss="modal">Submit Change</button>
+            </div>
             <!-- modal footer -->
-            <div class="modal-footer">
-              <button type="button" class="btn btn-primary" data-dismiss="modal"> Update Values </button>
+            <div id="footer">
+              <div class="form-group">
+                <!-- <div id="shoes-last-title" style="margin-bottom: 0.15em; font-size: 24px;" -->
+                <!-- class="modal-title"></div> -->
+                <table class="table">
+                  <tbody>
+                    <tr>
+                      <th class="noselect" scope="row">Shoe Travel</th>
+                      <td id="shoe-travel"></td>
+                    </tr>
+                    <tr>
+                      <th class="noselect" scope="row">Last Distance</th>
+                      <td id="current-distance"></td>
+                    </tr>
+                    <tr>
+                      <th class="noselect" scope="row">Last Update</th>
+                      <td id="last-updated"></td>
+                    </tr>
+                    <tr>
+                      <th class="noselect" scope="row">Change Distance</th>
+                      <td id="last-distance"></td>
+                    </tr>
+                    <tr>
+                      <th class="noselect" scope="row">Change Date</th>
+                      <td id="last-date"></td>
+                    </tr>
+                    <tr>
+                      <th class="noselect" scope="row">Days Installed</th>
+                      <td id="days-installed"></td>
+                    </tr>
+                    <tr>
+                      <th class="noselect" scope="row">Change Notes</th>
+                      <td>
+                        <p id="last-notes"></p>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         </div>
