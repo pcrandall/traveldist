@@ -64,13 +64,13 @@ func getDists(w http.ResponseWriter, r *http.Request) {
 	keys := make(map[string]cleanTravelDistances)
 	for rows.Next() {
 		var dist cleanTravelDistances
-		rows.Scan(&dist.Shuttle, &dist.Last_Updated, &dist.Shoe_Travel, &dist.Days_Installed, &dist.Shoes_Last_Distance, &dist.Shoes_Change_Distance, &dist.Shoes_Last_Changed, &dist.Notes)
+		rows.Scan(&dist.Shuttle, &dist.Last_Updated, &dist.Shoe_Travel, &dist.Days_Installed, &dist.Shoes_Last_Distance, &dist.Shoes_Change_Distance, &dist.Shoes_Last_Changed, &dist.Notes, &dist.UUID)
 		checkErr(err, "")
 		keys[dist.Shuttle] = dist
 	}
 
 	log.Printf("KEYS: %#v\n\n", keys)
-	json.NewEncoder(w).Encode(&keys)
+	json.NewEncoder(w).Encode(&keys) // encode to json and send to client
 	checkErr(err, "JSON encoding error")
 }
 

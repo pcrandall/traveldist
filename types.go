@@ -38,4 +38,5 @@ type cleanTravelDistances struct {
 	Days_Installed        string
 	Shoes_Last_Changed    string
 	Notes                 string
+	UUID                  string
 }

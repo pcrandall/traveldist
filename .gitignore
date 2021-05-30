@@ -1,6 +1,7 @@
 assets/
 config*
 releases/
+backups
 TravelDist.exe
 *.txt
 *.xlsm
