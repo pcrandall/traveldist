@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+
+	"github.com/pcrandall/travelDist/utils"
 )
 
 func ServeFrontEnd() {
@@ -12,6 +14,7 @@ func ServeFrontEnd() {
 	http.HandleFunc("/form", formHandler)
 	http.HandleFunc("/hello", helloHandler)
 	fmt.Printf("Frontend Server is ready and is listening at port :8000...\n")
+	utils.OpenBrowser("http://localhost:8000")
 	if err := http.ListenAndServe(":8000", nil); err != nil {
 		log.Fatal(err)
 	}

@@ -4,8 +4,8 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/acarl005/stripansi"
 	"github.com/google/uuid"
+	"github.com/pcrandall/travelDist/utils/stripansi"
 	"github.com/pkg/errors"
 )
 
