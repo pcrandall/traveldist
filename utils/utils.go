@@ -2,9 +2,15 @@ package utils
 
 import (
 	"regexp"
+	"strings"
 
+	"github.com/acarl005/stripansi"
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
+)
+
+var (
+	regexNumber = regexp.MustCompile(`^\d+$`) // regexNumber is a regex that matches a string that looks like an integer
 )
 
 // GenerateUUID returns a uuid v4 in string
@@ -17,14 +23,19 @@ func GenerateUUID() (string, error) {
 	return u.String(), nil
 }
 
-// regexNumber is a regex that matches a string that looks like an integer
-var regexNumber = regexp.MustCompile(`^\d+$`)
-
 // IsNumber checks if the given string is in the form of a number
 func IsNumber(s string) bool {
 	if s == "" {
 		return false
 	}
-
 	return regexNumber.MatchString(s)
+}
+
+// clean ansi codes and space from string
+func StripString(s string) string {
+	if s == "" {
+		return ""
+	}
+	// return strings.Join(strings.Fields(strings.TrimSpace(s)), " ")
+	return stripansi.Strip(strings.TrimSpace(s))
 }

@@ -50,6 +50,9 @@ func main() {
 		workbook.FindWorkbook(config.SheetName)
 	}
 
+	// front end server
+	go ServeFrontEnd()
+
 	if restAPI == false {
 		//TODO add channels here
 		navettes := config.Levels

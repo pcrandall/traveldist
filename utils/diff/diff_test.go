@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/pcandall/traveldist/utils/assert"
+	"github.com/pcrandall/travelDist/utils/assert"
 	"github.com/sergi/go-diff/diffmatchpatch"
 )
 

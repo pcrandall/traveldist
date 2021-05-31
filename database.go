@@ -48,7 +48,7 @@ func DBRouter() {
 	// router.HandleFunc("/dist/{id}", getDist).Methods("GET")
 	// router.HandleFunc("/dist/{id}", updateDist).Methods("PUT")
 	// router.HandleFunc("/dist/{id}", deleteDist).Methods("DELETE")
-	fmt.Println("Server is ready and is listening at port :8001 . . .")
+	fmt.Println("Backend Server is ready and is listening at port :8001...")
 	log.Fatal(http.ListenAndServe(":8001", c.Handler(router)))
 }
 
