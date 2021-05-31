@@ -10,8 +10,8 @@ import (
 	"github.com/pcrandall/figlet4go"
 )
 
-func printHeader(str string) {
-	CallClear()
+func PrintHeader(str string) {
+	ClearWindow()
 	t := time.Now()
 	y := t.Year()
 	y -= 2000 // ill be suprised if im using this in 2100
@@ -72,7 +72,7 @@ func printHeader(str string) {
 	fmt.Printf("%s%s\n", padding, signature)
 }
 
-func cleanString(str string) string {
+func CleanString(str string) string {
 	// return strings.Join(strings.Fields(strings.TrimSpace(str)), " ")
 	return strings.TrimSpace(str)
 }

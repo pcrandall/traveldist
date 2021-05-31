@@ -11,8 +11,8 @@ import (
 
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/olekukonko/tablewriter"
+	"github.com/pcrandall/travelDist/utils"
 	"github.com/pcrandall/travelDist/workbook"
-	// frames "github.com/pcrandall/mfsplaces/frames"
 )
 
 var (
@@ -23,13 +23,10 @@ var (
 		Timeout: 10 * time.Second,
 	}
 
-	config     *Config
-	err        error
-	getNavette string
-	writeFile  bool
-	clear      map[string]func()
-	resize     map[string]func()
-	restAPI    bool
+	config    *Config
+	err       error
+	writeFile bool
+	restAPI   bool
 )
 
 func main() {
@@ -37,12 +34,12 @@ func main() {
 	flag.BoolVar(&restAPI, "r", false, "restAPI -r=true")
 	flag.Parse()
 
-	callResize()
-	printHeader("TRAVELDIST")
+	utils.ResizeWindow()
+	utils.PrintHeader("TRAVELDIST")
 
 	//Initialize
 	logfile, err := os.OpenFile("./logs/logfile.txt", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
-	checkErr(err, "Error Creating logfile.txt")
+	utils.CheckErr(err, "Error Creating logfile.txt")
 	log.SetOutput(logfile)
 	defer logfile.Close()
 
@@ -59,16 +56,15 @@ func main() {
 		for _, nav := range navettes {
 			// fmt.Printf("Floor: [%d]\n", val.Floor)
 			for _, n := range nav.Navette {
-				getNavette = n.Name
 				// fmt.Printf("Name: %s, IP: %s, Row: %s\n", v.Name, v.IP, v.Row)
 				res, err := client.Get("http://" + n.IP + "/srm1TravelDistanceList.html")
-				checkErr(err, "Navette:"+n.Name+"IP address:"+n.IP)
+				utils.CheckErr(err, "Navette:"+n.Name+"IP address:"+n.IP)
 				if err != nil {
 					continue
 				}
 
 				body, err := ioutil.ReadAll(res.Body)
-				checkErr(err, "Navette:"+n.Name+"IP address:"+n.IP)
+				utils.CheckErr(err, "Navette:"+n.Name+"IP address:"+n.IP)
 				if err != nil {
 					continue
 				}
@@ -90,8 +86,8 @@ func main() {
 				//<td>I</td><td>2020-09-02 15:16:15:415</td><td id="desc"></td><td>TD Total: 4598010 4598010 </td><td>Td: 0 4598010 </td></td> err <nil>
 				//total looks like this now Total: 2912046
 				/// total[7:] to trim the string
-				row.shuttle = cleanString(n.Name)
-				row.timestamp = cleanString(lastDate)
+				row.shuttle = utils.CleanString(n.Name)
+				row.timestamp = utils.CleanString(lastDate)
 				row.distance = total[7:]
 				tableString = append(tableString, *row)
 
@@ -126,9 +122,9 @@ func RenderTable(locations []shuttleDistance) {
 	table.SetRowLine(true)
 
 	for _, val := range locations {
-		var row = []string{cleanString(val.shuttle), cleanString(val.distance), cleanString(val.timestamp)}
+		var row = []string{utils.CleanString(val.shuttle), utils.CleanString(val.distance), utils.CleanString(val.timestamp)}
 		table.Append(row)
-		// fmt.Println(cleanString(val[0]), cleanString(val[1]), cleanString(val[2]))
+		// fmt.Println(utils.CleanString(val[0]), utils.CleanString(val[1]), utils.CleanString(val[2]))
 	}
 	table.Render() // Send output
 }

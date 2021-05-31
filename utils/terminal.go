@@ -1,25 +1,12 @@
 package utils
 
 import (
-	"log"
 	"os"
 	"os/exec"
 	"runtime"
 )
 
-func DebugErr(err error) {
-	if err != nil {
-		log.Println(err)
-	}
-}
-
-func CheckErr(err error) {
-	if err != nil {
-		log.Panic(err)
-	}
-}
-
-func CallClear() {
+func ClearWindow() {
 	clear := make(map[string]func()) //Initialize it
 	clear["darwin"] = func() {
 		cmd := exec.Command("clear") //Linux example, its tested
@@ -48,17 +35,17 @@ func CallClear() {
 func ResizeWindow() {
 	resize := make(map[string]func())
 	resize["darwin"] = func() {
-		cmd := exec.Command("resize -s 35 120")
+		cmd := exec.Command("resize -s 30 120")
 		cmd.Stdout = os.Stdout
 		cmd.Run()
 	}
 	resize["linux"] = func() {
-		cmd := exec.Command("resize -s 35 120")
+		cmd := exec.Command("resize -s 30 120")
 		cmd.Stdout = os.Stdout
 		cmd.Run()
 	}
 	resize["windows"] = func() {
-		cmd := exec.Command("cmd", "/c", "mode con:cols=130 lines=35") //Windows example, its tested
+		cmd := exec.Command("cmd", "/c", "mode con:cols=120 lines=30") //Windows example, its tested
 		cmd.Stdout = os.Stdout
 		cmd.Run()
 	}

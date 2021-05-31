@@ -7,7 +7,6 @@ import (
 )
 
 func OpenBrowser(url string) {
-	var err error
 	switch runtime.GOOS {
 	case "linux":
 		err = exec.Command("xdg-open", url).Start()
@@ -18,5 +17,5 @@ func OpenBrowser(url string) {
 	default:
 		err = fmt.Errorf("unsupported platform")
 	}
-	CheckErr(err)
+	CheckErr(err, "OpenBrowser: err opening browser")
 }
