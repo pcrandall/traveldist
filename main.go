@@ -44,19 +44,18 @@ func main() {
 	log.SetOutput(logfile)
 	defer logfile.Close()
 
+	//TODO get rid of this
 	if writeFile {
 		workbook.FindWorkbook(config.SheetName)
 	}
 
+	// initiate loading screen
 	f := make(chan bool) // loading frames channel
-
-	go frames.Start(f) // initiate loading frames
+	go frames.Start(f)
 
 	var wg sync.WaitGroup
-	//TODO add channels here
 	if restAPI == false {
 		navettes := config.Levels
-
 		for _, nav := range navettes {
 			for _, n := range nav.Navette {
 				wg.Add(1)
@@ -69,14 +68,18 @@ func main() {
 	f <- true // send the stop signal to the go func and close channel
 	close(f)
 
+	//TODO get rid of this
 	if writeFile {
 		workbook.SaveFile()
 	}
 
 	//TODO
 	if restAPI == false {
-		RenderTable(tableString)
+		// RenderTable(tableString)
 		insertDatabase(tableString)
+		utils.PrintHeader("TRAVELDIST")
+		go ServeFrontEnd() // front end server
+		DBRouter()         // backend server
 	} else {
 		go ServeFrontEnd() // front end server
 		DBRouter()         // backend server
@@ -85,18 +88,19 @@ func main() {
 
 func ScrapPages(name string, ip string, excelRow string, wg *sync.WaitGroup) {
 	defer wg.Done()
-	// fmt.Printf("Name: %s, IP: %s, Row: %s\n", v.Name, v.IP, v.Row)
 	res, err := client.Get("http://" + ip + "/srm1TravelDistanceList.html")
 	utils.DebugErr(err, "Navette:"+name+"IP address:"+ip)
 	if err != nil {
 		return
 	}
+
 	defer res.Body.Close()
 	body, err := ioutil.ReadAll(res.Body)
 	utils.DebugErr(err, "Navette:"+name+"IP address:"+ip)
 	if err != nil {
 		return
 	}
+
 	pageContent := string(body)
 
 	// parse the page content and pull the relevant values

@@ -80,6 +80,16 @@ func IsNumber(s string) bool {
 	return regexNumber.MatchString(s)
 }
 
+// 2020-09-02 15:16:15:415 --> 2020-09-02 15:16:15
+func CleanTimeStamp(s string) string {
+	regexTimeStamp := regexp.MustCompile(`\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}`)
+	if s == "" {
+		return ""
+	}
+	clean := regexTimeStamp.FindString(s)
+	return clean
+}
+
 // clean ansi codes and space from string
 func StripString(s string) string {
 	if s == "" {
