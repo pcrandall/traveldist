@@ -12,9 +12,9 @@ import (
 
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/olekukonko/tablewriter"
+	"github.com/pcrandall/travelDist/frames"
 	"github.com/pcrandall/travelDist/utils"
 	"github.com/pcrandall/travelDist/workbook"
-	"github.com/pcrandall/traveldist/frames"
 )
 
 var (
@@ -69,9 +69,6 @@ func main() {
 	f <- true // send the stop signal to the go func and close channel
 	close(f)
 
-	// front end server
-	go ServeFrontEnd()
-
 	if writeFile {
 		workbook.SaveFile()
 	}
@@ -81,7 +78,8 @@ func main() {
 		RenderTable(tableString)
 		insertDatabase(tableString)
 	} else {
-		DBRouter()
+		go ServeFrontEnd() // front end server
+		DBRouter()         // backend server
 	}
 }
 
