@@ -7,6 +7,7 @@ require (
 	github.com/charmbracelet/bubbles v0.7.6
 	github.com/charmbracelet/bubbletea v0.12.4
 	github.com/fatih/color v1.10.0
+	github.com/go-bindata/go-bindata v3.1.2+incompatible // indirect
 	github.com/google/go-cmp v0.5.4 // indirect
 	github.com/gorilla/mux v1.8.0
 	github.com/kr/pretty v0.1.0 // indirect
