@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"strconv"
@@ -53,7 +54,7 @@ func DBRouter() {
 	})
 	router := mux.NewRouter()
 	router.HandleFunc("/dists", getDists).Methods("GET") // get all the distances from db
-	// router.HandleFunc("/dist", createDist).Methods("POST")
+	router.HandleFunc("/change", changeShoe).Methods("POST")
 	// router.HandleFunc("/dist/{id}", getDist).Methods("GET")
 	// router.HandleFunc("/dist/{id}", updateDist).Methods("PUT")
 	// router.HandleFunc("/dist/{id}", deleteDist).Methods("DELETE")
@@ -84,25 +85,28 @@ func getDists(w http.ResponseWriter, r *http.Request) {
 	utils.CheckErr(err, "JSON encoding error")
 }
 
-// func createPost(w http.ResponseWriter, r *http.Request) {
-// 	w.Header().Set("Content-Type", "application/json")
-// 	stmt, err := db.Prepare("INSERT INTO posts(title) VALUES(?)")
-// 	if err != nil {
-// 		panic(err.Error())
-// 	}
-// 	body, err := ioutil.ReadAll(r.Body)
-// 	if err != nil {
-// 		panic(err.Error())
-// 	}
-// 	keyVal := make(map[string]string)
-// 	json.Unmarshal(body, &keyVal)
-// 	title := keyVal["title"]
-// 	_, err = stmt.Exec(title)
-// 	if err != nil {
-// 		panic(err.Error())
-// 	}
-// 	fmt.Fprintf(w, "New post was created")
-// }
+func changeShoe(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	// stmt, err := db.Prepare("INSERT INTO posts(title) VALUES(?)")
+	if err != nil {
+		panic(err.Error())
+	}
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		panic(err.Error())
+	}
+	log.Println("database.go.98: ", body)
+	fmt.Println("database.go.98: ", body)
+
+	// keyVal := make(map[string]string)
+	// json.Unmarshal(body, &keyVal)
+	// title := keyVal["title"]
+	// _, err = stmt.Exec(title)
+	// if err != nil {
+	// 	panic(err.Error())
+	// }
+	// fmt.Fprintf(w, "New post was created")
+}
 
 func BackupDB(location string) {
 	db, err := sql.Open("sqlite3", location)

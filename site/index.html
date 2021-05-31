@@ -87,7 +87,8 @@
     </style>
     <!-- document ready -->
     <script>
-      var shoeData;
+      var shoeData; // this is all the "CURRENT" shoe data from the sqlite db
+      var modalID; // the current navette modal that's open
       $(document).ready(function () {
         <!-- query the db -->
         fetch('http://localhost:8001/dists').then(response => response.json())
@@ -113,6 +114,7 @@
         <!-- navette buttons send data to modal form -->
         $("#distanceContainer").on("click", "button", function (e) {
           var myid = this.id;
+          modalID = this.id;
           $("#shoes-title").text(myid + " Collector Shoe Change")
           $("#current-distance").text(shoeData[myid].Shoes_Last_Distance)
           $("#last-updated").text(shoeData[myid].Last_Updated)
@@ -136,13 +138,42 @@
           }
         });
         $('#shoesModal').on('hidden.bs.modal', function (e) {
-          $(this).find("input,select").val('').end().find(
-            "input[type=checkbox], input[type=radio]").prop("checked",
-            "").end();
-          $("#change-notes").val(
-            "Performed By: \nShoe Distance(km): \nShoe Measurement: \nOther Notes: "
-          )
-        })
+            $(this).find("input,select").val('').end().find(
+              "input[type=checkbox], input[type=radio]").prop("checked",
+              "").end();
+            $("#change-notes").val(
+              "Performed By: \nShoe Distance(km): \nShoe Measurement: \nOther Notes: "
+            )
+          })
+          <!-- submit change -->
+        $(function () {
+          $('#submit-change').click(function () {
+            const New_Change_Date = $('#date').val() // string
+            const New_Change_Distance = parseInt($('#change-distance').val()) // distance needs to be int
+            const New_Change_Notes = $('#change-notes').val() // string
+            const data = {
+              "Shuttle": shoeData[modalID].Shuttle,
+              "New_Change_Distance": New_Change_Distance,
+              "New_Change_Date": New_Change_Date,
+              "New_Change_Notes": New_Change_Notes,
+              "Previous_Change_UUID": shoeData[modalID].UUID
+            };
+
+                  console.log({data})
+            fetch('http://localhost:8001/change', {
+              method: 'POST', // or 'PUT'
+              headers: {
+                'Accept': 'application/json, text/plain, */*',
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify(data),
+            }).then(response => response.json()).then(data => {
+              console.log('Success:', data);
+            }).catch((error) => {
+              console.error('Error:', error);
+            });
+          });
+        });
       });
 
     </script>
@@ -332,7 +363,7 @@
               </div>
             </form>
             <div class="modal-footer" style="border: none; !important">
-              <button type="button" class="btn btn-primary" data-dismiss="modal">Submit Change</button>
+              <button id="submit-change" type="button" class="btn btn-primary" data-dismiss="modal">Submit Change</button>
             </div>
             <!-- modal footer -->
             <div id="footer">
