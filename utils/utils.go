@@ -1,7 +1,6 @@
 package utils
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"path/filepath"
@@ -24,7 +23,6 @@ func init() {
 	if _, err := os.Stat(logpath); os.IsNotExist(err) {
 		os.MkdirAll(logpath, os.ModePerm)
 	}
-
 	//Initialize
 	logfile, err = os.OpenFile("./logs/logfile.txt", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 	CheckErr(err, "Error Creating logfile.txt")
@@ -32,33 +30,17 @@ func init() {
 	defer logfile.Close()
 }
 
-type WrappedError struct {
-	Context string
-	Err     error
-}
-
-func (w *WrappedError) Error() string {
-	return fmt.Sprintf("%s: %v", w.Context, w.Err)
-}
-
-func WrapError(err error, info string) *WrappedError {
-	return &WrappedError{
-		Context: info,
-		Err:     err,
-	}
-}
-
+// only prints errors to log
 func DebugErr(err error, str string) {
 	if err != nil {
-		e := WrapError(err, str)
-		log.Println(e)
+		log.Println(errors.Wrap(err, str))
 	}
 }
 
+// prints to log then panic if err
 func CheckErr(err error, str string) {
 	if err != nil {
-		e := WrapError(err, str)
-		log.Println(e)
+		log.Panicln(errors.Wrap(err, str))
 	}
 }
 
@@ -97,6 +79,18 @@ func StripString(s string) string {
 	}
 	// return strings.Join(strings.Fields(strings.TrimSpace(s)), " ")
 	return stripansi.Strip(strings.TrimSpace(s))
+}
+
+// trim space from string
+func TrimString(str string) string {
+	return strings.TrimSpace(str)
+}
+
+// strips all non alphanumeric except ./-_
+func StripNONALPHANUMERIC(str string) string {
+	const ansi = "[^a-zA-Z0-9_-]*"
+	re := regexp.MustCompile(ansi)
+	return re.ReplaceAllString(str, "")
 }
 
 // func GetConfig(str string, config interface{}) {

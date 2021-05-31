@@ -119,8 +119,8 @@ func ScrapPages(name string, ip string, excelRow string, wg *sync.WaitGroup) {
 	//<td>I</td><td>2020-09-02 15:16:15:415</td><td id="desc"></td><td>TD Total: 4598010 4598010 </td><td>Td: 0 4598010 </td></td> err <nil>
 	//total looks like this now Total: 2912046
 	/// total[7:] to trim the string
-	dbRow.shuttle = utils.CleanString(name)
-	dbRow.timestamp = utils.CleanString(lastDate)
+	dbRow.shuttle = utils.TrimString(name)
+	dbRow.timestamp = utils.TrimString(lastDate)
 	dbRow.distance = total[7:]
 	tableString = append(tableString, *dbRow)
 
@@ -138,7 +138,7 @@ func RenderTable(locations []shuttleDistance) {
 	table.SetRowLine(true)
 
 	for _, val := range locations {
-		var row = []string{utils.CleanString(val.shuttle), utils.CleanString(val.distance), utils.CleanString(val.timestamp)}
+		var row = []string{utils.TrimString(val.shuttle), utils.TrimString(val.distance), utils.TrimString(val.timestamp)}
 		table.Append(row)
 		// fmt.Println(utils.CleanString(val[0]), utils.CleanString(val[1]), utils.CleanString(val[2]))
 	}

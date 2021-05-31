@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/gorilla/mux"
 	"github.com/pcrandall/travelDist/utils"
@@ -14,17 +15,22 @@ import (
 )
 
 func insertDatabase(distances []shuttleDistance) {
+	BackupDB("db/traveldistances.db")
+	utils.CheckErr(err, "database.go.19 Error Backing up DB: ")
+
 	db, err := sql.Open("sqlite3", "db/traveldistances.db")
 	utils.CheckErr(err, "Error connecting to database")
+
 	db.Ping()
 	utils.CheckErr(err, "Error pinging database")
+
 	defer db.Close()
 
 	// insert distances into db
 	for _, row := range distances {
 		stmt, err := db.Prepare("INSERT INTO DISTANCES(shuttle, distance, timestamp) VALUES(?,?,?);")
 		utils.CheckErr(err, "Error preparing DB")
-		dist, err := strconv.Atoi(utils.CleanString(row.distance))
+		dist, err := strconv.Atoi(utils.TrimString(row.distance))
 		utils.CheckErr(err, "Error converting distance to int")
 
 		// make the timestamp valid
@@ -97,3 +103,19 @@ func getDists(w http.ResponseWriter, r *http.Request) {
 // 	}
 // 	fmt.Fprintf(w, "New post was created")
 // }
+
+func BackupDB(location string) {
+	db, err := sql.Open("sqlite3", location)
+	utils.CheckErr(err, "Error connecting to database")
+	db.Ping()
+	utils.CheckErr(err, "Error pinging database"+location)
+	defer db.Close()
+
+	t := time.Now()
+	backupLocation := "./db/backups/" + t.Format("2006-01-02_150405") + "__traveldistances.db"
+	stmt, err := db.Prepare(`VACUUM main INTO ?;`)
+	utils.CheckErr(err, "database.go.112 Error preparing DB: ")
+
+	_, err = stmt.Exec(&backupLocation)
+	utils.CheckErr(err, "database.go.115 Error backing up DB: ")
+}

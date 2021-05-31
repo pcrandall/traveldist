@@ -3,7 +3,6 @@ package utils
 import (
 	"fmt"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/fatih/color"
@@ -70,9 +69,4 @@ func PrintHeader(str string) {
 	fmt.Println(renderStr[:len(renderStr)-len(renderStr)/11*3-1])
 	// print the signature
 	fmt.Printf("%s%s\n", padding, signature)
-}
-
-func CleanString(str string) string {
-	// return strings.Join(strings.Fields(strings.TrimSpace(str)), " ")
-	return strings.TrimSpace(str)
 }
