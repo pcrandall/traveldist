@@ -52,13 +52,15 @@ func DBRouter() {
 		AllowedOrigins: []string{"*"},          // All origins
 		AllowedMethods: []string{"GET", "PUT"}, // Allowing only get, just an example
 	})
+
 	router := mux.NewRouter()
 	router.HandleFunc("/dists", getDists).Methods("GET") // get all the distances from db
-	router.HandleFunc("/change", changeShoe).Methods("POST")
+	router.HandleFunc("/change", changeShoe)
 	// router.HandleFunc("/dist/{id}", getDist).Methods("GET")
 	// router.HandleFunc("/dist/{id}", updateDist).Methods("PUT")
 	// router.HandleFunc("/dist/{id}", deleteDist).Methods("DELETE")
 	fmt.Println("Backend Server is ready and is listening at port :8001...")
+
 	log.Fatal(http.ListenAndServe(":8001", c.Handler(router)))
 }
 
@@ -86,6 +88,13 @@ func getDists(w http.ResponseWriter, r *http.Request) {
 }
 
 func changeShoe(w http.ResponseWriter, r *http.Request) {
+
+	fmt.Printf("we changein\n")
+
+	fmt.Printf("request: %#v\n\n", *r)
+
+	log.Printf("request: %#v\n\n", *r)
+
 	w.Header().Set("Content-Type", "application/json")
 	// stmt, err := db.Prepare("INSERT INTO posts(title) VALUES(?)")
 	if err != nil {
@@ -106,6 +115,9 @@ func changeShoe(w http.ResponseWriter, r *http.Request) {
 	// 	panic(err.Error())
 	// }
 	// fmt.Fprintf(w, "New post was created")
+
+	fmt.Println(json.NewEncoder(w).Encode(&body)) // encode to json and send to client)
+	json.NewEncoder(w).Encode(&body)              // encode to json and send to client
 }
 
 func BackupDB(location string) {
