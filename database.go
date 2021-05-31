@@ -31,10 +31,11 @@ func insertDatabase(val []shuttleDistance) {
 		res, err := stmt.Exec(&row.shuttle, &dist, &row.timestamp)
 		utils.CheckErr(err, "Error inserting into db")
 
-		id, err := res.LastInsertId()
+		_, err = res.LastInsertId()
+		// id, err := res.LastInsertId()
 		utils.CheckErr(err, "Error getting last id")
 
-		log.Println("Last InsertID: ", id)
+		// log.Println("Last InsertID: ", id)
 	}
 }
 
@@ -68,9 +69,10 @@ func getDists(w http.ResponseWriter, r *http.Request) {
 		rows.Scan(&dist.Shuttle, &dist.Last_Updated, &dist.Shoe_Travel, &dist.Days_Installed, &dist.Shoes_Last_Distance, &dist.Shoes_Change_Distance, &dist.Shoes_Last_Changed, &dist.Notes, &dist.UUID)
 		utils.CheckErr(err, "")
 		keys[dist.Shuttle] = dist
+		log.Printf("database.go.72 getDists(): %#v\n", dist)
 	}
 
-	log.Printf("KEYS: %#v\n\n", keys)
+	// log.Printf("KEYS: %#v\n\n", keys)
 	json.NewEncoder(w).Encode(&keys) // encode to json and send to client
 	utils.CheckErr(err, "JSON encoding error")
 }

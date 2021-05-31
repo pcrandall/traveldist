@@ -7,17 +7,18 @@ import (
 	"net/http"
 	"os"
 	"regexp"
+	"sync"
 	"time"
 
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/olekukonko/tablewriter"
 	"github.com/pcrandall/travelDist/utils"
 	"github.com/pcrandall/travelDist/workbook"
+	"github.com/pcrandall/traveldist/frames"
 )
 
 var (
-	tableString        []shuttleDistance
-	getTravelDistances []travelDistances
+	tableString []shuttleDistance
 
 	client = &http.Client{
 		Timeout: 10 * time.Second,
@@ -47,58 +48,29 @@ func main() {
 		workbook.FindWorkbook(config.SheetName)
 	}
 
-	// front end server
-	go ServeFrontEnd()
+	f := make(chan bool) // loading frames channel
 
+	go frames.Start(f) // initiate loading frames
+
+	var wg sync.WaitGroup
+	//TODO add channels here
 	if restAPI == false {
-		//TODO add channels here
 		navettes := config.Levels
+
 		for _, nav := range navettes {
-			// fmt.Printf("Floor: [%d]\n", val.Floor)
 			for _, n := range nav.Navette {
-				// fmt.Printf("Name: %s, IP: %s, Row: %s\n", v.Name, v.IP, v.Row)
-				res, err := client.Get("http://" + n.IP + "/srm1TravelDistanceList.html")
-				utils.CheckErr(err, "Navette:"+n.Name+"IP address:"+n.IP)
-				if err != nil {
-					continue
-				}
-
-				body, err := ioutil.ReadAll(res.Body)
-				utils.CheckErr(err, "Navette:"+n.Name+"IP address:"+n.IP)
-				if err != nil {
-					continue
-				}
-				pageContent := string(body)
-
-				// parse the page content and pull the relevant values
-				row := new(shuttleDistance)
-				date := regexp.MustCompile(`(\d{4}-\d{2}-\d{2})[\s\d:]{13}`)
-				//<td>I</td><td>2020-09-02 15:16:15:415</td><td id="desc"></td><td>TD Total: 4598010 4598010 </td><td>Td: 0 4598010 </td></td> err <nil>
-				// date returns 2020-09-02 15:16:15:415 from the above
-				dateMatchAll := date.FindAllStringSubmatch(pageContent, -1)
-				lastDate := dateMatchAll[len(dateMatchAll)-1][0]
-				log.Println(n.Name, lastDate)
-
-				r := regexp.MustCompile(`Total:[\d\s]{9}`)
-				// give me all the matches
-				submatchall := r.FindAllStringSubmatch(pageContent, -1)
-				total := submatchall[len(submatchall)-1][0]
-				//<td>I</td><td>2020-09-02 15:16:15:415</td><td id="desc"></td><td>TD Total: 4598010 4598010 </td><td>Td: 0 4598010 </td></td> err <nil>
-				//total looks like this now Total: 2912046
-				/// total[7:] to trim the string
-				row.shuttle = utils.CleanString(n.Name)
-				row.timestamp = utils.CleanString(lastDate)
-				row.distance = total[7:]
-				tableString = append(tableString, *row)
-
-				if writeFile {
-					workbook.WriteFile(n.Row, config.SheetName, total[0])
-				}
-				defer res.Body.Close()
+				wg.Add(1)
+				go ScrapPages(n.Name, n.IP, n.Row, &wg)
 			}
 		}
-
 	}
+	wg.Wait()
+
+	f <- true // send the stop signal to the go func and close channel
+	close(f)
+
+	// front end server
+	go ServeFrontEnd()
 
 	if writeFile {
 		workbook.SaveFile()
@@ -110,6 +82,48 @@ func main() {
 		insertDatabase(tableString)
 	} else {
 		DBRouter()
+	}
+}
+
+func ScrapPages(name string, ip string, excelRow string, wg *sync.WaitGroup) {
+	defer wg.Done()
+	// fmt.Printf("Name: %s, IP: %s, Row: %s\n", v.Name, v.IP, v.Row)
+	res, err := client.Get("http://" + ip + "/srm1TravelDistanceList.html")
+	utils.DebugErr(err, "Navette:"+name+"IP address:"+ip)
+	if err != nil {
+		return
+	}
+	defer res.Body.Close()
+	body, err := ioutil.ReadAll(res.Body)
+	utils.DebugErr(err, "Navette:"+name+"IP address:"+ip)
+	if err != nil {
+		return
+	}
+	pageContent := string(body)
+
+	// parse the page content and pull the relevant values
+	dbRow := new(shuttleDistance)
+	date := regexp.MustCompile(`(\d{4}-\d{2}-\d{2})[\s\d:]{13}`)
+	//<td>I</td><td>2020-09-02 15:16:15:415</td><td id="desc"></td><td>TD Total: 4598010 4598010 </td><td>Td: 0 4598010 </td></td> err <nil>
+	// date returns 2020-09-02 15:16:15:415 from the above
+	dateMatchAll := date.FindAllStringSubmatch(pageContent, -1)
+	lastDate := dateMatchAll[len(dateMatchAll)-1][0]
+	log.Println(name, lastDate)
+
+	r := regexp.MustCompile(`Total:[\d\s]{9}`)
+	// give me all the matches
+	submatchall := r.FindAllStringSubmatch(pageContent, -1)
+	total := submatchall[len(submatchall)-1][0]
+	//<td>I</td><td>2020-09-02 15:16:15:415</td><td id="desc"></td><td>TD Total: 4598010 4598010 </td><td>Td: 0 4598010 </td></td> err <nil>
+	//total looks like this now Total: 2912046
+	/// total[7:] to trim the string
+	dbRow.shuttle = utils.CleanString(name)
+	dbRow.timestamp = utils.CleanString(lastDate)
+	dbRow.distance = total[7:]
+	tableString = append(tableString, *dbRow)
+
+	if writeFile {
+		workbook.WriteFile(excelRow, config.SheetName, total[0])
 	}
 }
 

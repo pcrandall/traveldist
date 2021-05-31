@@ -2,7 +2,6 @@ package utils
 
 import (
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
@@ -12,7 +11,6 @@ import (
 	"github.com/google/uuid"
 	"github.com/pcrandall/travelDist/utils/stripansi"
 	"github.com/pkg/errors"
-	"gopkg.in/yaml.v2"
 )
 
 var (
@@ -91,28 +89,30 @@ func StripString(s string) string {
 	return stripansi.Strip(strings.TrimSpace(s))
 }
 
-func GetConfig(str string, config interface{}) {
-	if _, err := os.Stat(str); err == nil { // check if config file exists
-		yamlFile, err := ioutil.ReadFile(str)
-		if err != nil {
-			panic(err)
-		}
-		err = yaml.Unmarshal(yamlFile, &config)
-		if err != nil {
-			panic(err)
-		}
-		// } else if os.IsNotExist(err) { // config file not included, use embedded config
-		// 	yamlFile, err := Asset(str)
-		// 	if err != nil {
-		// 		panic(err)
-		// 	}
-		// 	err = yaml.Unmarshal(yamlFile, &config)
-		// 	if err != nil {
-		// 		panic(err)
-		// 	}
-		// } else {
-	} else {
-		fmt.Println("Schrodinger: file may or may not exist. See err for details.")
-		// panic(err)
-	}
-}
+// func GetConfig(str string, config interface{}) {
+// 	fmt.Println("Bfore: ", config)
+// 	if _, err := os.Stat(str); err == nil { // check if config file exists
+// 		yamlFile, err := ioutil.ReadFile(str)
+// 		if err != nil {
+// 			panic(err)
+// 		}
+// 		err = yaml.Unmarshal(yamlFile, config)
+// 		if err != nil {
+// 			log.Panic(err)
+// 		}
+// 		// } else if os.IsNotExist(err) { // config file not included, use embedded config
+// 		// 	yamlFile, err := Asset(str)
+// 		// 	if err != nil {
+// 		// 		panic(err)
+// 		// 	}
+// 		// 	err = yaml.Unmarshal(yamlFile, &config)
+// 		// 	if err != nil {
+// 		// 		panic(err)
+// 		// 	}
+// 		// } else {
+// 	} else {
+// 		CheckErr(err, "Schrodinger: file may or may not exist. See err for details.")
+// 	}
+
+// 	fmt.Println("After: ", config)
+// }
