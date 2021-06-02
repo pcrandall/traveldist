@@ -91,12 +91,9 @@
       var modalID; // the current navette modal that's open
       $(document).ready(function () {
         <!-- query the db -->
-        fetch('http://localhost:8001/dists').then(response => response.json())
+        fetch('http://localhost:8001/dist').then(response => response.json())
           .then(data => {
             shoeData = data
-              <!-- console.log({ -->
-              <!--     data -->
-              <!--   }) -->
               <!-- populate the button value with the distance from the db -->
             const navButtons = $('[id^=N]');
             const n = Object.entries(navButtons)
@@ -162,12 +159,25 @@
             d
           })
           const _send = new URLSearchParams(d)
-          fetch('http://localhost:8001/change?' + _send).then(response =>
+
+          <!-- fetch('http://localhost:8001/change?' + _send).then(response => -->
+          <!--     response.json()).then(data => { -->
+          <!--     console.log('Success:', data); -->
+          <!--   }).catch((error) => { -->
+          <!--     console.error('Error:', error); -->
+          <!--   }) -->
+
+            fetch('http://localhost:8001/dist',{
+              method: 'post',
+              body: JSON.stringify(d),
+              headers: { 'Content-type': 'application/json' }
+                  }).then(response =>
               response.json()).then(data => {
               console.log('Success:', data);
             }).catch((error) => {
               console.error('Error:', error);
             })
+
             <!-- fetch('http://localhost:8001/change', { -->
             <!--   method: 'post', -->
             <!--   body: JSON.stringify(_send), -->

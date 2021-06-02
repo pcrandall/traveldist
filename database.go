@@ -15,6 +15,61 @@ import (
 	"github.com/rs/cors"
 )
 
+// Change Shoe (Model)
+type ChangeShoe struct {
+	Shuttle            string `json:"Shuttle"`
+	NewChangeDistance  string `json:"New_Change_Distance"`
+	NewChangeDate      string `json:"New_Change_Date"`
+	NewChangeNotes     string `json:"New_Change_Notes"`
+	PreviousChangeUUID string `json:"Previous_Change_UUID"`
+}
+
+func DBRouter() {
+	c := cors.New(cors.Options{
+		AllowedOrigins: []string{"*"},                            // All origins
+		AllowedMethods: []string{"GET", "POST", "PUT", "DELETE"}, // Allowing only get, just an example
+	})
+
+	router := mux.NewRouter()
+	router.HandleFunc("/dist", getDists).Methods("GET") // get all the distances from db
+	router.HandleFunc("/dist", CreateChangeShoe).Methods("POST")
+	// router.HandleFunc("/dist/{id}", getDist).Methods("GET")
+	// router.HandleFunc("/dist/{id}", updateDist).Methods("PUT")
+	// router.HandleFunc("/dist/{id}", deleteDist).Methods("DELETE")
+	fmt.Println("Backend Server is ready and is listening at port :8001...")
+
+	log.Fatal(http.ListenAndServe(":8001", c.Handler(router)))
+}
+
+func CreateChangeShoe(w http.ResponseWriter, r *http.Request) {
+	var change ChangeShoe
+	w.Header().Set("Content-Type", "application/json")
+	json.NewDecoder(r.Body).Decode(&change) // encode to json and send to client
+	fmt.Printf("change: %#v\n\n", *r)
+	log.Printf("change: %#v\n\n", *r)
+
+	params := mux.Vars(r)
+	log.Printf("params: %v\n\n", params)
+	log.Printf("requestURI: %v\n\n", r.RequestURI)
+	fmt.Printf("requestURI: %v\n\n", r.RequestURI)
+
+	for v, p := range params {
+		fmt.Printf("iter\n\n")
+		fmt.Printf("v: %s p: %#v\n\n", v, p)
+	}
+
+	if err != nil {
+		panic(err.Error())
+	}
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		panic(err.Error())
+	}
+	log.Println("database.go.98: ", body)
+	fmt.Println("database.go.98: ", body)
+	// fmt.Println(json.NewEncoder(w).Encode(&body)) // encode to json and send to client)
+}
+
 func insertDatabase(distances []shuttleDistance) {
 	BackupDB("db/traveldistances.db")
 	utils.CheckErr(err, "database.go.19 Error Backing up DB: ")
@@ -47,23 +102,6 @@ func insertDatabase(distances []shuttleDistance) {
 	}
 }
 
-func DBRouter() {
-	c := cors.New(cors.Options{
-		AllowedOrigins: []string{"*"},          // All origins
-		AllowedMethods: []string{"GET", "PUT"}, // Allowing only get, just an example
-	})
-
-	router := mux.NewRouter()
-	router.HandleFunc("/dists", getDists).Methods("GET") // get all the distances from db
-	router.HandleFunc("/change", changeShoe)
-	// router.HandleFunc("/dist/{id}", getDist).Methods("GET")
-	// router.HandleFunc("/dist/{id}", updateDist).Methods("PUT")
-	// router.HandleFunc("/dist/{id}", deleteDist).Methods("DELETE")
-	fmt.Println("Backend Server is ready and is listening at port :8001...")
-
-	log.Fatal(http.ListenAndServe(":8001", c.Handler(router)))
-}
-
 func getDists(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	db, err := sql.Open("sqlite3", "db/traveldistances.db")
@@ -85,39 +123,6 @@ func getDists(w http.ResponseWriter, r *http.Request) {
 	// log.Printf("KEYS: %#v\n\n", keys)
 	json.NewEncoder(w).Encode(&keys) // encode to json and send to client
 	utils.CheckErr(err, "JSON encoding error")
-}
-
-func changeShoe(w http.ResponseWriter, r *http.Request) {
-
-	fmt.Printf("we changein\n")
-
-	fmt.Printf("request: %#v\n\n", *r)
-
-	log.Printf("request: %#v\n\n", *r)
-
-	w.Header().Set("Content-Type", "application/json")
-	// stmt, err := db.Prepare("INSERT INTO posts(title) VALUES(?)")
-	if err != nil {
-		panic(err.Error())
-	}
-	body, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		panic(err.Error())
-	}
-	log.Println("database.go.98: ", body)
-	fmt.Println("database.go.98: ", body)
-
-	// keyVal := make(map[string]string)
-	// json.Unmarshal(body, &keyVal)
-	// title := keyVal["title"]
-	// _, err = stmt.Exec(title)
-	// if err != nil {
-	// 	panic(err.Error())
-	// }
-	// fmt.Fprintf(w, "New post was created")
-
-	fmt.Println(json.NewEncoder(w).Encode(&body)) // encode to json and send to client)
-	json.NewEncoder(w).Encode(&body)              // encode to json and send to client
 }
 
 func BackupDB(location string) {
