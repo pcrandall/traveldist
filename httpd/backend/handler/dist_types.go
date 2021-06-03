@@ -1,24 +1,12 @@
-package main
+package handler
 
-type Config struct {
-	SheetName string `yaml:"sheetname"`
-	Levels    []struct {
-		Floor   int `yaml:"floor"`
-		Navette []struct {
-			Name string `yaml:"name"`
-			IP   string `yaml:"ip"`
-			Row  string `yaml:"row"`
-		} `yaml:"navette"`
-	} `yaml:"levels"`
+type ShuttleDistance struct {
+	Shuttle   string
+	Distance  string
+	Timestamp string
 }
 
-type shuttleDistance struct {
-	shuttle   string
-	distance  string
-	timestamp string
-}
-
-type travelDistances struct {
+type TravelDistances struct {
 	T1_shuttle           string
 	T1_distance          int
 	T2_distance          int
@@ -29,7 +17,7 @@ type travelDistances struct {
 	Notes                string
 }
 
-type cleanTravelDistances struct {
+type CleanTravelDistances struct {
 	Shuttle               string
 	Last_Updated          string
 	Shoes_Last_Distance   int
@@ -39,4 +27,12 @@ type cleanTravelDistances struct {
 	Shoes_Last_Changed    string
 	Notes                 string
 	UUID                  string
+}
+
+type ChangeShoe struct {
+	Shuttle            string `json:"Shuttle"`
+	NewChangeDistance  string `json:"New_Change_Distance"`
+	NewChangeDate      string `json:"New_Change_Date"`
+	NewChangeNotes     string `json:"New_Change_Notes"`
+	PreviousChangeUUID string `json:"Previous_Change_UUID"`
 }

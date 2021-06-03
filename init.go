@@ -10,6 +10,18 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+type Config struct {
+	SheetName string `yaml:"sheetname"`
+	Levels    []struct {
+		Floor   int `yaml:"floor"`
+		Navette []struct {
+			Name string `yaml:"name"`
+			IP   string `yaml:"ip"`
+			Row  string `yaml:"row"`
+		} `yaml:"navette"`
+	} `yaml:"levels"`
+}
+
 func init() {
 	logpath := filepath.Join(".", "logs")
 	if _, err := os.Stat(logpath); os.IsNotExist(err) {

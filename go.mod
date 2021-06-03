@@ -7,6 +7,7 @@ require (
 	github.com/charmbracelet/bubbles v0.7.6
 	github.com/charmbracelet/bubbletea v0.12.4
 	github.com/fatih/color v1.10.0
+	github.com/go-chi/chi v1.5.4
 	github.com/google/go-cmp v0.5.4
 	github.com/google/uuid v1.2.0
 	github.com/gorilla/mux v1.8.0

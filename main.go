@@ -13,12 +13,15 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/olekukonko/tablewriter"
 	"github.com/pcrandall/travelDist/frames"
+	"github.com/pcrandall/travelDist/httpd/backend/handler"
+	frontend "github.com/pcrandall/travelDist/httpd/frontend/handler"
 	"github.com/pcrandall/travelDist/utils"
 	"github.com/pcrandall/travelDist/workbook"
 )
 
 var (
-	tableString []shuttleDistance
+	// distancesSlice []shuttleDistance
+	distancesSlice []handler.ShuttleDistance
 
 	client = &http.Client{
 		Timeout: 10 * time.Second,
@@ -76,13 +79,17 @@ func main() {
 	//TODO
 	if restAPI == false {
 		// RenderTable(tableString)
-		insertDatabase(tableString)
+		handler.InsertDistances(distancesSlice)
 		utils.PrintHeader("TRAVELDIST")
-		go ServeFrontEnd() // front end server
-		DBRouter()         // backend server
+		go frontend.ServeFrontEnd()
+		handler.ChiRouter()
+		// go ServeFrontEnd() // front end server
+		// DBRouter()         // backend server
 	} else {
-		go ServeFrontEnd() // front end server
-		DBRouter()         // backend server
+		go frontend.ServeFrontEnd() // front end server
+		handler.ChiRouter()         // backend server
+		// go ServeFrontEnd()
+		// DBRouter()         // backend server
 	}
 }
 
@@ -104,7 +111,9 @@ func ScrapPages(name string, ip string, excelRow string, wg *sync.WaitGroup) {
 	pageContent := string(body)
 
 	// parse the page content and pull the relevant values
-	dbRow := new(shuttleDistance)
+	dbRow := new(handler.ShuttleDistance)
+	// dbRow := &handler.ShuttleDistance{}
+
 	date := regexp.MustCompile(`(\d{4}-\d{2}-\d{2})[\s\d:]{13}`)
 	//<td>I</td><td>2020-09-02 15:16:15:415</td><td id="desc"></td><td>TD Total: 4598010 4598010 </td><td>Td: 0 4598010 </td></td> err <nil>
 	// date returns 2020-09-02 15:16:15:415 from the above
@@ -119,17 +128,19 @@ func ScrapPages(name string, ip string, excelRow string, wg *sync.WaitGroup) {
 	//<td>I</td><td>2020-09-02 15:16:15:415</td><td id="desc"></td><td>TD Total: 4598010 4598010 </td><td>Td: 0 4598010 </td></td> err <nil>
 	//total looks like this now Total: 2912046
 	/// total[7:] to trim the string
-	dbRow.shuttle = utils.TrimString(name)
-	dbRow.timestamp = utils.TrimString(lastDate)
-	dbRow.distance = total[7:]
-	tableString = append(tableString, *dbRow)
+
+	dbRow.Shuttle = utils.TrimString(name)
+	dbRow.Timestamp = utils.TrimString(lastDate)
+	dbRow.Distance = total[7:]
+
+	distancesSlice = append(distancesSlice, *dbRow)
 
 	if writeFile {
 		workbook.WriteFile(excelRow, config.SheetName, total[0])
 	}
 }
 
-func RenderTable(locations []shuttleDistance) {
+func RenderTable(locations []handler.ShuttleDistance) {
 	table := tablewriter.NewWriter(os.Stdout)
 	table.SetHeader([]string{"Shuttle", "Distance", "Timestamp"})
 	table.SetTablePadding("\t") // pad with tabs
@@ -138,7 +149,7 @@ func RenderTable(locations []shuttleDistance) {
 	table.SetRowLine(true)
 
 	for _, val := range locations {
-		var row = []string{utils.TrimString(val.shuttle), utils.TrimString(val.distance), utils.TrimString(val.timestamp)}
+		var row = []string{utils.TrimString(val.Shuttle), utils.TrimString(val.Distance), utils.TrimString(val.Timestamp)}
 		table.Append(row)
 		// fmt.Println(utils.CleanString(val[0]), utils.CleanString(val[1]), utils.CleanString(val[2]))
 	}
