@@ -19,6 +19,7 @@ func ChiRouter(port string) {
 	dist := distances.New()
 
 	r.Get("/dist", GetDistances(dist))
+	r.Get("/distparam", GetShoeParameters())
 	r.Post("/dist", PostDistance(dist))
 
 	fmt.Println("Backend Server is ready and is listening at port :8001...")

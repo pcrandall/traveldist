@@ -20,20 +20,20 @@ type Item struct {
 	UUID                  string
 }
 
-type Repo struct {
+type Distance struct {
 	Items []Item
 }
 
-func New() *Repo {
-	return &Repo{
+func New() *Distance {
+	return &Distance{
 		Items: []Item{},
 	}
 }
 
-func (r *Repo) Add(item Item) {
+func (r *Distance) Add(item Item) {
 	r.Items = append(r.Items, item)
 }
 
-func (r *Repo) GetAll() []Item {
+func (r *Distance) GetAll() []Item {
 	return r.Items
 }

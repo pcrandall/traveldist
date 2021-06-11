@@ -13,14 +13,15 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/olekukonko/tablewriter"
 	"github.com/pcrandall/travelDist/frames"
-	"github.com/pcrandall/travelDist/httpd/handler"
+	controllerHandler "github.com/pcrandall/travelDist/httpd/handler"
+	"github.com/pcrandall/travelDist/httpd/platform/shoeparameters"
 	"github.com/pcrandall/travelDist/utils"
-	frontend "github.com/pcrandall/travelDist/view"
+	viewHandler "github.com/pcrandall/travelDist/view/handler"
 )
 
 var (
 	// distancesSlice []shuttleDistance
-	distancesSlice []handler.ShuttleDistance
+	distancesSlice []controllerHandler.ShuttleDistance
 
 	client = &http.Client{
 		Timeout: 10 * time.Second,
@@ -66,21 +67,30 @@ func main() {
 	f <- true // send the stop signal to the go func and close channel
 	close(f)
 
-	//TODO
-	if restAPI == false {
-		// RenderTable(tableString)
-		handler.InsertDistance(distancesSlice)
-		utils.PrintHeader("TRAVELDIST")
-		go frontend.ServeView(config.View.Port)
-		handler.ChiRouter(config.Controller.Port)
-		// go ServeFrontEnd() // front end server
-		// DBRouter()         // backend server
+	// set the config parameters
+	shoeparameters.SetShoeParameters(config.ShoeParameters.Check, config.ShoeParameters.Interval)
+
+	////TODO
+	//if restAPI == false {
+	//	controllerHandler.InsertDistance(distancesSlice)
+	//	utils.PrintHeader("TRAVELDIST")
+	//	go viewHandler.ServeView(config.View.Port)
+	//	controllerHandler.ChiRouter(config.Controller.Port)
+	//} else {
+	//	go viewHandler.ServeView(config.View.Port) // front end server
+	//	controllerHandler.ChiRouter(config.Controller.Port)
+	//}
+
+	if restAPI {
+		go viewHandler.ServeView(config.View.Port) // front end server
+		controllerHandler.ChiRouter(config.Controller.Port)
 	} else {
-		go frontend.ServeView(config.View.Port) // front end server
-		handler.ChiRouter(config.Controller.Port)
-		// go ServeFrontEnd()
-		// DBRouter()         // backend server
+		controllerHandler.InsertDistance(distancesSlice)
+		utils.PrintHeader("TRAVELDIST")
+		go viewHandler.ServeView(config.View.Port)
+		controllerHandler.ChiRouter(config.Controller.Port)
 	}
+
 }
 
 func ScrapPages(name string, ip string, wg *sync.WaitGroup) {
@@ -101,7 +111,7 @@ func ScrapPages(name string, ip string, wg *sync.WaitGroup) {
 	pageContent := string(body)
 
 	// parse the page content and pull the relevant values
-	dbRow := new(handler.ShuttleDistance)
+	dbRow := new(controllerHandler.ShuttleDistance)
 	// dbRow := &handler.ShuttleDistance{}
 
 	date := regexp.MustCompile(`(\d{4}-\d{2}-\d{2})[\s\d:]{13}`)
@@ -127,7 +137,7 @@ func ScrapPages(name string, ip string, wg *sync.WaitGroup) {
 
 }
 
-func RenderTable(locations []handler.ShuttleDistance) {
+func RenderTable(locations []controllerHandler.ShuttleDistance) {
 	table := tablewriter.NewWriter(os.Stdout)
 	table.SetHeader([]string{"Shuttle", "Distance", "Timestamp"})
 	table.SetTablePadding("\t") // pad with tabs

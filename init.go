@@ -10,11 +10,18 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-// ShoeChange
-type ShoeChange struct {
-	Change int `yaml:"change"`
-	Warn   int `yaml:"warn"`
-	Check  int `yaml:"check"`
+// Config
+type Config struct {
+	Levels         []Levels       `yaml:"levels"`
+	View           View           `yaml:"view"`
+	Controller     Controller     `yaml:"controller"`
+	ShoeParameters ShoeParameters `yaml:"shoe_change"`
+}
+
+// Levels
+type Levels struct {
+	Floor   int       `yaml:"floor"`
+	Navette []Navette `yaml:"navette"`
 }
 
 // Navette
@@ -33,17 +40,10 @@ type Controller struct {
 	Port string `yaml:"port"`
 }
 
-// Yaml2Go
-type Config struct {
-	Levels     []Levels   `yaml:"levels"`
-	View       View       `yaml:"view"`
-	Controller Controller `yaml:"controller"`
-}
-
-// Levels
-type Levels struct {
-	Floor   int       `yaml:"floor"`
-	Navette []Navette `yaml:"navette"`
+// ShoeCheck
+type ShoeParameters struct {
+	Check    int `yaml:"check"`
+	Interval int `yaml:"interval"`
 }
 
 func init() {

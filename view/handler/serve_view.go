@@ -9,7 +9,8 @@ import (
 )
 
 func ServeView(port string) {
-	fileServer := http.FileServer(http.Dir("./site"))
+	// fileServer := http.FileServer(http.Dir("./site"))
+	fileServer := http.FileServer(http.Dir("view/site"))
 	http.Handle("/", fileServer)
 	// http.HandleFunc("/form", formHandler)
 	// http.HandleFunc("/hello", helloHandler)
