@@ -10,23 +10,12 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-// type Config struct {
-// 	View []struct {
-// 		Port string `yaml:"port"`
-// 	} `yaml:"view"`
-
-// 	Controller []struct {
-// 		Port string `yaml:"port"`
-// 	} `yaml:"controller"`
-
-// 	Levels []struct {
-// 		Floor   int `yaml:"floor"`
-// 		Navette []struct {
-// 			Name string `yaml:"name"`
-// 			IP   string `yaml:"ip"`
-// 		} `yaml:"navette"`
-// 	} `yaml:"levels"`
-// }
+// ShoeChange
+type ShoeChange struct {
+	Change int `yaml:"change"`
+	Warn   int `yaml:"warn"`
+	Check  int `yaml:"check"`
+}
 
 // Navette
 type Navette struct {
