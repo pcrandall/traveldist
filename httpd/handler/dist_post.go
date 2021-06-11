@@ -8,7 +8,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"github.com/pcrandall/travelDist/httpd/backend/platform/distances"
+	"github.com/pcrandall/travelDist/httpd/platform/distances"
 )
 
 func DistPost(feed distances.Adder) http.HandlerFunc {

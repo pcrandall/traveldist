@@ -13,10 +13,9 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/olekukonko/tablewriter"
 	"github.com/pcrandall/travelDist/frames"
-	"github.com/pcrandall/travelDist/httpd/backend/handler"
-	frontend "github.com/pcrandall/travelDist/httpd/frontend/handler"
+	"github.com/pcrandall/travelDist/httpd/handler"
 	"github.com/pcrandall/travelDist/utils"
-	"github.com/pcrandall/travelDist/workbook"
+	frontend "github.com/pcrandall/travelDist/view"
 )
 
 var (
@@ -47,11 +46,6 @@ func main() {
 	log.SetOutput(logfile)
 	defer logfile.Close()
 
-	//TODO get rid of this
-	if writeFile {
-		workbook.FindWorkbook(config.SheetName)
-	}
-
 	// initiate loading screen
 	f := make(chan bool) // loading frames channel
 	go frames.Start(f)
@@ -62,7 +56,8 @@ func main() {
 		for _, nav := range navettes {
 			for _, n := range nav.Navette {
 				wg.Add(1)
-				go ScrapPages(n.Name, n.IP, n.Row, &wg)
+				// go ScrapPages(n.Name, n.IP, n.Row, &wg)
+				go ScrapPages(n.Name, n.Ip, &wg)
 			}
 		}
 	}
@@ -71,29 +66,24 @@ func main() {
 	f <- true // send the stop signal to the go func and close channel
 	close(f)
 
-	//TODO get rid of this
-	if writeFile {
-		workbook.SaveFile()
-	}
-
 	//TODO
 	if restAPI == false {
 		// RenderTable(tableString)
 		handler.InsertDistances(distancesSlice)
 		utils.PrintHeader("TRAVELDIST")
-		go frontend.ServeFrontEnd()
-		handler.ChiRouter()
+		go frontend.ServeView(config.View.Port)
+		handler.ChiRouter(config.Controller.Port)
 		// go ServeFrontEnd() // front end server
 		// DBRouter()         // backend server
 	} else {
-		go frontend.ServeFrontEnd() // front end server
-		handler.ChiRouter()         // backend server
+		go frontend.ServeView(config.View.Port) // front end server
+		handler.ChiRouter(config.Controller.Port)
 		// go ServeFrontEnd()
 		// DBRouter()         // backend server
 	}
 }
 
-func ScrapPages(name string, ip string, excelRow string, wg *sync.WaitGroup) {
+func ScrapPages(name string, ip string, wg *sync.WaitGroup) {
 	defer wg.Done()
 	res, err := client.Get("http://" + ip + "/srm1TravelDistanceList.html")
 	utils.DebugErr(err, "Navette:"+name+"IP address:"+ip)
@@ -135,9 +125,6 @@ func ScrapPages(name string, ip string, excelRow string, wg *sync.WaitGroup) {
 
 	distancesSlice = append(distancesSlice, *dbRow)
 
-	if writeFile {
-		workbook.WriteFile(excelRow, config.SheetName, total[0])
-	}
 }
 
 func RenderTable(locations []handler.ShuttleDistance) {

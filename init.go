@@ -10,16 +10,51 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+// type Config struct {
+// 	View []struct {
+// 		Port string `yaml:"port"`
+// 	} `yaml:"view"`
+
+// 	Controller []struct {
+// 		Port string `yaml:"port"`
+// 	} `yaml:"controller"`
+
+// 	Levels []struct {
+// 		Floor   int `yaml:"floor"`
+// 		Navette []struct {
+// 			Name string `yaml:"name"`
+// 			IP   string `yaml:"ip"`
+// 		} `yaml:"navette"`
+// 	} `yaml:"levels"`
+// }
+
+// Navette
+type Navette struct {
+	Ip   string `yaml:"ip"`
+	Name string `yaml:"name"`
+}
+
+// View
+type View struct {
+	Port string `yaml:"port"`
+}
+
+// Controller
+type Controller struct {
+	Port string `yaml:"port"`
+}
+
+// Yaml2Go
 type Config struct {
-	SheetName string `yaml:"sheetname"`
-	Levels    []struct {
-		Floor   int `yaml:"floor"`
-		Navette []struct {
-			Name string `yaml:"name"`
-			IP   string `yaml:"ip"`
-			Row  string `yaml:"row"`
-		} `yaml:"navette"`
-	} `yaml:"levels"`
+	Levels     []Levels   `yaml:"levels"`
+	View       View       `yaml:"view"`
+	Controller Controller `yaml:"controller"`
+}
+
+// Levels
+type Levels struct {
+	Floor   int       `yaml:"floor"`
+	Navette []Navette `yaml:"navette"`
 }
 
 func init() {

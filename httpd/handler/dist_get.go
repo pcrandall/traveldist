@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/pcrandall/travelDist/httpd/backend/platform/distances"
+	"github.com/pcrandall/travelDist/httpd/platform/distances"
 	"github.com/pcrandall/travelDist/utils"
 )
 

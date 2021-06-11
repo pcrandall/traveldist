@@ -1,4 +1,4 @@
-package frontend
+package view
 
 import (
 	"fmt"
@@ -8,9 +8,7 @@ import (
 	"github.com/pcrandall/travelDist/utils"
 )
 
-func ServeFrontEnd() {
-	port := ":8000"
-	// fileServer := http.FileServer(http.Dir("../../../site"))
+func ServeView(port string) {
 	fileServer := http.FileServer(http.Dir("./site"))
 	http.Handle("/", fileServer)
 	// http.HandleFunc("/form", formHandler)

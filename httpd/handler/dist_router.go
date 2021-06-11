@@ -6,17 +6,16 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi"
-	"github.com/pcrandall/travelDist/httpd/backend/platform/distances"
+	"github.com/pcrandall/travelDist/httpd/platform/distances"
 	"github.com/rs/cors"
 )
 
-func ChiRouter() {
+func ChiRouter(port string) {
 	c := cors.New(cors.Options{
 		AllowedOrigins: []string{"*"},                            // All origins
 		AllowedMethods: []string{"GET", "POST", "PUT", "DELETE"}, // Allowing only get, just an example
 	})
 	r := chi.NewRouter()
-	port := ":8001"
 	dist := distances.New()
 
 	r.Get("/dist", DistGet(dist))
