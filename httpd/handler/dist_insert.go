@@ -7,7 +7,7 @@ import (
 	"github.com/pcrandall/travelDist/utils"
 )
 
-func InsertDistances(distances []ShuttleDistance) {
+func InsertDistance(distances []ShuttleDistance) {
 	// Backup("db/traveldistances.db")
 	// utils.CheckErr(err, "database.go.19 Error Backing up DB: ")
 

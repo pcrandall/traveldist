@@ -69,7 +69,7 @@ func main() {
 	//TODO
 	if restAPI == false {
 		// RenderTable(tableString)
-		handler.InsertDistances(distancesSlice)
+		handler.InsertDistance(distancesSlice)
 		utils.PrintHeader("TRAVELDIST")
 		go frontend.ServeView(config.View.Port)
 		handler.ChiRouter(config.Controller.Port)

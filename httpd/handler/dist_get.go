@@ -9,7 +9,7 @@ import (
 	"github.com/pcrandall/travelDist/utils"
 )
 
-func DistGet(_dist distances.Getter) http.HandlerFunc {
+func GetDistances(_dist distances.Getter) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// items := feed.GetAll()
 		// json.NewEncoder(w).Encode(items)

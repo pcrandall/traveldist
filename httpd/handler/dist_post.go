@@ -11,7 +11,7 @@ import (
 	"github.com/pcrandall/travelDist/httpd/platform/distances"
 )
 
-func DistPost(feed distances.Adder) http.HandlerFunc {
+func PostDistance(feed distances.Adder) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// request := map[string]string{}
 		// json.NewDecoder(r.Body).Decode(&request)

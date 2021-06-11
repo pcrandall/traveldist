@@ -18,8 +18,8 @@ func ChiRouter(port string) {
 	r := chi.NewRouter()
 	dist := distances.New()
 
-	r.Get("/dist", DistGet(dist))
-	r.Post("/dist", DistPost(dist))
+	r.Get("/dist", GetDistances(dist))
+	r.Post("/dist", PostDistance(dist))
 
 	fmt.Println("Backend Server is ready and is listening at port :8001...")
 	log.Fatal(http.ListenAndServe(port, c.Handler(r)))
