@@ -89,12 +89,12 @@
     <script>
       var shoeData; // this is all the "CURRENT" shoe data from the sqlite db
       var modalID; // the current navette modal that's open
-      var changeDist; // the current navette modal that's open
+      var changeParams; // the current navette modal that's open
       $(document).ready(function () {
         fetch('http://localhost:8001/distparam').then(response => response.json())
           .then(data => {
-            shoeData = data
-                  console.log({shoeData})
+            changeParams = data
+                  console.log({changeParams})
           });
         <!-- query the db -->
         fetch('http://localhost:8001/dist').then(response => response.json())
