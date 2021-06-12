@@ -1,14 +1,14 @@
 package distances
 
 type Getter interface {
-	GetAll() []Item
+	GetAll() []Distance
 }
 
 type Adder interface {
-	Add(item Item)
+	Add(item Distance)
 }
 
-type Item struct {
+type Distance struct {
 	Shuttle               string
 	Last_Updated          string
 	Shoes_Last_Distance   int
@@ -20,20 +20,20 @@ type Item struct {
 	UUID                  string
 }
 
-type Distance struct {
-	Items []Item
+type TravelDistances struct {
+	Distances []Distance
 }
 
-func New() *Distance {
-	return &Distance{
-		Items: []Item{},
+func New() *TravelDistances {
+	return &TravelDistances{
+		Distances: []Distance{},
 	}
 }
 
-func (r *Distance) Add(item Item) {
-	r.Items = append(r.Items, item)
+func (r *TravelDistances) Add(item Distance) {
+	r.Distances = append(r.Distances, item)
 }
 
-func (r *Distance) GetAll() []Item {
-	return r.Items
+func (r *TravelDistances) GetAll() []Distance {
+	return r.Distances
 }

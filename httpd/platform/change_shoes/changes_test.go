@@ -1,19 +1,19 @@
-package distances
+package change
 
 import "testing"
 
 func TestAdd(t *testing.T) {
-	d := New()
-	d.Add(Distance{})
-	if len(d.Distances) != 1 {
+	c := New()
+	c.Add(Change{})
+	if len(c.Changes) != 1 {
 		t.Errorf("Item was not added")
 	}
 }
 
 func TestGetAll(t *testing.T) {
-	d := New()
-	d.Add(Distance{})
-	results := d.GetAll()
+	c := New()
+	c.Add(Change{})
+	results := c.GetAll()
 	if len(results) != 1 {
 		t.Errorf("Item was not added")
 	}
