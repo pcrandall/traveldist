@@ -7,7 +7,6 @@ require (
 	github.com/go-chi/chi v1.5.4
 	github.com/google/go-cmp v0.5.4
 	github.com/google/uuid v1.2.0
-	github.com/gorilla/mux v1.8.0
 	github.com/mattn/go-runewidth v0.0.10 // indirect
 	github.com/mattn/go-sqlite3 v1.14.7
 	github.com/olekukonko/tablewriter v0.0.5

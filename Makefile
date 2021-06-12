@@ -1,5 +1,6 @@
 GOBINDATA := $(shell command -v go-bindata 2> /dev/null)
 currentDir := $(shell pwd)
+winDir := $(cmd.exe dir)
 
 ## installation
 install:
@@ -34,15 +35,12 @@ build:
 
 runWindows:
 	@echo "==> running WINDOWS travelDistance"
-	@${currentDir}/scripts/windows/runWindows.bat
+	@cmd.exe "${winDir}/scripts/windows/runWindows.bat"
 .PHONY: runWindows
 
 runWindowsRest:
 	@echo "==> running WINDOWS REST travelDistance"
-	@set GOARCH=386
-	@set GOOS=windows
-	@set CGO_ENABLED=1
-	@go run . -r
+	@cmd.exe "${winDir}\\scripts\\windows\\runWindowsRestAPI.bat"
 .PHONY: runWindowsRest
 
 buildWindows:

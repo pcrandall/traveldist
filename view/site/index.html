@@ -149,87 +149,46 @@
             )
           })
           <!-- submit change -->
-        $('#submit-change').click(function () {
+        $('#submit-change').click(async function () {
+
           const New_Change_Date = $('#date').val() // string
           const New_Change_Distance = parseInt($('#change-distance').val()) // distance needs to be int
           const New_Change_Notes = $('#change-notes').val() // string
-          const d = {
+          const formData = {
             "Shuttle": shoeData[modalID].Shuttle,
             "New_Change_Distance": New_Change_Distance === NaN ?
-              "nil" : New_Change_Date,
+              "nil" : New_Change_Distance,
             "New_Change_Date": New_Change_Date === "" ? "empty" : New_Change_Date,
             "New_Change_Notes": New_Change_Notes,
             "Previous_Change_UUID": shoeData[modalID].UUID
           };
-          console.log({
-            d
-          })
-          const _send = new URLSearchParams(d)
 
-          <!-- fetch('http://localhost:8001/change?' + _send).then(response => -->
-          <!--     response.json()).then(data => { -->
-          <!--     console.log('Success:', data); -->
-          <!--   }).catch((error) => { -->
-          <!--     console.error('Error:', error); -->
-          <!--   }) -->
+          console.log({formData})
+          postData('http://localhost:8001/dist', formData)
+                  .then(data => {console.log(data);});
 
-            fetch('http://localhost:8001/dist',{
-              method: 'post',
-              body: JSON.stringify(d),
-              headers: { 'Content-type': 'application/json' }
-                  }).then(response =>
-              response.json()).then(data => {
-              console.log('Success:', data);
-            }).catch((error) => {
-              console.error('Error:', error);
-            })
-
-            <!-- fetch('http://localhost:8001/change', { -->
-            <!--   method: 'post', -->
-            <!--   body: JSON.stringify(_send), -->
-            <!--   headers: { 'Content-type': 'application/json' } -->
-            <!-- }) -->
-            .then(response => response.json()).then(data => {
-              console.log('Success:', data);
-            }).catch((error) => {
-              console.error('Error:', error);
-            })
-            <!-- $.post("http://localhost:8001/change?",{d}, -->
-            <!-- function(data,status){ -->
-            <!-- alert("Data: " + data + "\nStatus: " + status); -->
-            <!-- }); -->
-            <!-- fetch("http://localhost:8001/change", { -->
-            <!--   method: "POST", // or 'PUT' -->
-            <!--   headers: { -->
-            <!--     "Accept": "application/json, text/plain, */*", -->
-            <!--     "Content-Type": "application/json", -->
-            <!--   }, -->
-            <!--   body: d, -->
-            <!-- }).then(response => response.json()).then(data => { -->
-            <!--   console.log('Success:', data); -->
-            <!-- }).catch((error) => { -->
-            <!--   console.error('Error:', error); -->
-            <!-- }); -->
         });
       });
-      // Example POST method implementation:
-      async function postData(url = '', data = {}) {
-        // Default options are marked with *
-        const response = await fetch(url, {
-          method: 'POST', // *GET, POST, PUT, DELETE, etc.
-          mode: 'cors', // no-cors, *cors, same-origin
-          cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
-          credentials: 'same-origin', // include, *same-origin, omit
-          headers: {
-            'Content-Type': 'application/json'
-              // 'Content-Type': 'application/x-www-form-urlencoded',
-          },
-          redirect: 'follow', // manual, *follow, error
-          referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
-          body: JSON.stringify(data) // body data type must match "Content-Type" header
-        });
-        return response.json(); // parses JSON response into native JavaScript objects
-      }
+
+          async function postData(url = '', data = {}) {
+            const response = await fetch(url, {
+              method: 'POST', // or 'PUT'
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify(data),
+            })
+            .then(response => response.json())
+            .then(data => {
+              <!-- console.log('Success:', data); -->
+              return data
+            })
+            .catch((error) => {
+              <!-- console.error('Error:', JSON.stringify(error)); -->
+              return error
+            });
+            return response
+          }
 
     </script>
   </head>
