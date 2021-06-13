@@ -3,31 +3,39 @@ package utils
 import (
 	"log"
 	"os"
-	"path/filepath"
 	"regexp"
+	"runtime"
 	"strings"
 
 	"github.com/google/uuid"
 	"github.com/pcrandall/travelDist/utils/stripansi"
 	"github.com/pkg/errors"
+	"gopkg.in/natefinch/lumberjack.v2"
 )
 
 var (
 	err         error
-	logfile     *os.File
+	Logfile     *os.File
+	ErrLog      *log.Logger
 	regexNumber = regexp.MustCompile(`^\d+$`) // regexNumber is a regex that matches a string that looks like an integer
 )
 
-func init() {
-	logpath := filepath.Join(".", "logs")
-	if _, err := os.Stat(logpath); os.IsNotExist(err) {
-		os.MkdirAll(logpath, os.ModePerm)
+func InitLog() {
+	Logfile, err = os.OpenFile("logs/logfile.txt", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+	if err != nil {
+		panic(err)
 	}
-	//Initialize
-	logfile, err = os.OpenFile("./logs/logfile.txt", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
-	CheckErr(err, "Error Creating logfile.txt")
-	log.SetOutput(logfile)
-	defer logfile.Close()
+	ErrLog = log.New(Logfile, "", log.Ldate|log.Ltime|log.LstdFlags)
+	ErrLog.SetOutput(&lumberjack.Logger{
+		Filename:   "logs/logfile.txt",
+		MaxSize:    25, // megabytes after which new file is created
+		MaxBackups: 3,  // number of backups
+		MaxAge:     28, //days
+	})
+
+	log.SetOutput(Logfile)
+
+	defer Logfile.Close()
 }
 
 // only prints errors to log
@@ -40,7 +48,10 @@ func DebugErr(err error, str string) {
 // prints to log then panic if err
 func CheckErr(err error, str string) {
 	if err != nil {
-		log.Panicln(errors.Wrap(err, str))
+		// notice that we're using 1, so it will actually log the where
+		// the error happened, 0 = this function, we don't want that.
+		pc, fn, line, _ := runtime.Caller(1)
+		ErrLog.Panicf("[error] in %s[%s:%d] %v", runtime.FuncForPC(pc).Name(), fn, line, errors.Wrap(err, str))
 	}
 }
 

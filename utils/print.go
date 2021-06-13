@@ -9,26 +9,26 @@ import (
 	"github.com/pcrandall/figlet4go"
 )
 
-func PrintHeader(str string) {
+func PrintHeader(str string, ver string) {
 	ClearWindow()
 	t := time.Now()
 	y := t.Year()
 	y -= 2000 // ill be suprised if im using this in 2100
 	padding := ""
-	signature := "pcrandall '" + strconv.Itoa(y)
+	signature := "pcrandall '" + strconv.Itoa(y) + " " + ver
 	paddingLen := 0
 
 	ascii := figlet4go.NewAsciiRender()
 	// change the font color
 	// uncomment to activate colors
 	colors := [...]color.Attribute{
-		color.FgWhite,
+		// color.FgWhite,
 		// color.FgMagenta,
 		// color.FgYellow,
 		// color.FgCyan,
 		// color.FgBlue,
 		// color.FgHiGreen,
-		// color.FgGreen,
+		color.FgGreen,
 	}
 	options := figlet4go.NewRenderOptions()
 	options.FontColor = make([]color.Attribute, len(str))

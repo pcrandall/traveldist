@@ -5,13 +5,11 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"os"
 	"regexp"
 	"sync"
 	"time"
 
 	_ "github.com/mattn/go-sqlite3"
-	"github.com/olekukonko/tablewriter"
 	"github.com/pcrandall/travelDist/frames"
 	controllerHandler "github.com/pcrandall/travelDist/httpd/handler"
 	"github.com/pcrandall/travelDist/httpd/platform/shoeparameters"
@@ -20,17 +18,19 @@ import (
 )
 
 var (
-	// distancesSlice []shuttleDistance
-	distancesSlice []controllerHandler.ShuttleDistance
-
-	client = &http.Client{
+	Version     = "v0.1"
+	ProgramName = "TRAVELDIST"
+	client      = &http.Client{
 		Timeout: 10 * time.Second,
 	}
+	config               *Config
+	distancesSlice       []controllerHandler.ShuttleDistance
+	loadingFramesChannel = make(chan bool)
+	wg                   sync.WaitGroup
 
-	config    *Config
 	err       error
-	writeFile bool
 	restAPI   bool
+	writeFile bool
 )
 
 func main() {
@@ -38,59 +38,51 @@ func main() {
 	flag.BoolVar(&restAPI, "r", false, "restAPI -r=true")
 	flag.Parse()
 
+	// initialize logging
+	utils.InitLog()
+	log.SetOutput(utils.Logfile)
+
+	// resize console window to default size
 	utils.ResizeWindow()
-	utils.PrintHeader("TRAVELDIST")
 
-	//Initialize
-	logfile, err := os.OpenFile("./logs/logfile.txt", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
-	utils.CheckErr(err, "Error Creating logfile.txt")
-	log.SetOutput(logfile)
-	defer logfile.Close()
+	// print out program header
+	utils.PrintHeader(ProgramName, Version)
 
-	// initiate loading screen
-	f := make(chan bool) // loading frames channel
-	go frames.Start(f)
-
-	var wg sync.WaitGroup
-	if restAPI == false {
-		navettes := config.Levels
-		for _, nav := range navettes {
-			for _, n := range nav.Navette {
-				wg.Add(1)
-				// go ScrapPages(n.Name, n.IP, n.Row, &wg)
-				go ScrapPages(n.Name, n.Ip, &wg)
-			}
-		}
-	}
-	wg.Wait()
-
-	f <- true // send the stop signal to the go func and close channel
-	close(f)
+	utils.ErrLog.Println("Travel Distances started")
+	// // For testing only
+	// utils.CheckErr(fmt.Errorf("BIG BAD ERROR\n"), "PLZ NO MORE!!!")
 
 	// set the config parameters
 	shoeparameters.SetShoeParameters(config.ShoeParameters.Check, config.ShoeParameters.Interval)
 
-	////TODO
-	//if restAPI == false {
-	//	controllerHandler.InsertDistance(distancesSlice)
-	//	utils.PrintHeader("TRAVELDIST")
-	//	go viewHandler.ServeView(config.View.Port)
-	//	controllerHandler.ChiRouter(config.Controller.Port)
-	//} else {
-	//	go viewHandler.ServeView(config.View.Port) // front end server
-	//	controllerHandler.ChiRouter(config.Controller.Port)
-	//}
-
-	if restAPI {
+	if restAPI == true {
 		go viewHandler.ServeView(config.View.Port) // front end server
 		controllerHandler.ChiRouter(config.Controller.Port)
 	} else {
+		// initiate loading screen
+		go frames.Start(loadingFramesChannel)
+		navettes := config.Levels
+		for _, nav := range navettes {
+			for _, n := range nav.Navette {
+				wg.Add(1)
+				// read the level control web interface
+				go ScrapPages(n.Name, n.Ip, &wg)
+			}
+		}
+		// wait for all concurrent jobs to finish
+		wg.Wait()
+
+		loadingFramesChannel <- true // send the stop signal to the go func and close channel
+		close(loadingFramesChannel)
+
+		// insert new values into the DISTANCE table
 		controllerHandler.InsertDistance(distancesSlice)
-		utils.PrintHeader("TRAVELDIST")
+		utils.PrintHeader(ProgramName, Version)
+
+		// Start servers
 		go viewHandler.ServeView(config.View.Port)
 		controllerHandler.ChiRouter(config.Controller.Port)
 	}
-
 }
 
 func ScrapPages(name string, ip string, wg *sync.WaitGroup) {
@@ -132,23 +124,5 @@ func ScrapPages(name string, ip string, wg *sync.WaitGroup) {
 	dbRow.Shuttle = utils.TrimString(name)
 	dbRow.Timestamp = utils.TrimString(lastDate)
 	dbRow.Distance = total[7:]
-
 	distancesSlice = append(distancesSlice, *dbRow)
-
-}
-
-func RenderTable(locations []controllerHandler.ShuttleDistance) {
-	table := tablewriter.NewWriter(os.Stdout)
-	table.SetHeader([]string{"Shuttle", "Distance", "Timestamp"})
-	table.SetTablePadding("\t") // pad with tabs
-	table.SetAutoWrapText(true)
-	table.SetAutoFormatHeaders(true)
-	table.SetRowLine(true)
-
-	for _, val := range locations {
-		var row = []string{utils.TrimString(val.Shuttle), utils.TrimString(val.Distance), utils.TrimString(val.Timestamp)}
-		table.Append(row)
-		// fmt.Println(utils.CleanString(val[0]), utils.CleanString(val[1]), utils.CleanString(val[2]))
-	}
-	table.Render() // Send output
 }
