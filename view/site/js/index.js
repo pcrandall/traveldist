@@ -3,12 +3,14 @@ var modalID; // the current navette modal that's open
 var changeParams; // the current navette modal that's open
 
 $(document).ready(function () {
+
   fetch("http://localhost:8001/distparam")
     .then((response) => response.json())
     .then((data) => {
       changeParams = data;
       console.log({ changeParams });
     });
+
   fetch("http://localhost:8001/dist")
     .then((response) => response.json())
     .then((data) => {
@@ -29,23 +31,24 @@ $(document).ready(function () {
     });
 
   // navette buttons send data to modal form
-  $("#distanceContainer").on("click", "button", function (e) {
-    var myid = this.id;
+  $("#distanceContainer").on("click", "button", function () {
     modalID = this.id;
-    $("#shoes-title").text(myid + " Collector Shoe Change");
-    $("#current-distance").text(shoeData[myid].Shoes_Last_Distance);
-    $("#last-updated").text(shoeData[myid].Last_Updated);
-    $("#last-distance").text(shoeData[myid].Shoes_Change_Distance);
-    $("#last-date").text(shoeData[myid].Shoes_Last_Changed);
+    $("#shoes-title").text(modalID + " Collector Shoe Change");
+    $("#button-title").text(modalID + " Collector Shoes");
+    $("#current-distance").text(shoeData[modalID].Shoes_Last_Distance);
+    $("#last-updated").text(shoeData[modalID].Last_Updated);
+    $("#last-distance").text(shoeData[modalID].Shoes_Change_Distance);
+    $("#last-date").text(shoeData[modalID].Shoes_Last_Changed);
     $("#change-notes").val(
       "Performed By: \nShoe Distance(km): \nShoe Measurement: \nOther Notes: "
     );
     $("#days-installed").text(
-      shoeData[myid].Days_Installed === "" ? "0" : shoeData[myid].Days_Installed
+      shoeData[modalID].Days_Installed === "" ? "0" : shoeData[modalID].Days_Installed
     );
-    $("#shoe-travel").text(shoeData[myid].Shoe_Travel + " km");
-    $("#last-notes").text(shoeData[myid].Notes);
+    $("#shoe-travel").text(shoeData[modalID].Shoe_Travel + " km");
+    $("#last-notes").text(shoeData[modalID].Notes);
   });
+
   const navDiv = $("[id$=div]");
   const d = Object.entries(navDiv);
   d.forEach(([key, value]) => {
@@ -56,7 +59,7 @@ $(document).ready(function () {
     }
   });
 
-  $("#shoesModal").on("hidden.bs.modal", function (e) {
+  $("#shoesModal").on("hidden.bs.modal", function () {
     $(this)
       .find("input,select")
       .val("")
