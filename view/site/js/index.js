@@ -33,7 +33,8 @@ $(document).ready(function () {
   // navette buttons send data to modal form
   $("#distanceContainer").on("click", "button", function () {
     modalID = this.id;
-    $("#shoes-title").text(modalID + " Collector Shoe Change");
+    $("#change-title").text(modalID + " Collector Shoe Change");
+    $("#check-title").text(modalID + " Collector Shoes Check");
     $("#button-title").text(modalID + " Collector Shoes");
     $("#current-distance").text(shoeData[modalID].Shoes_Last_Distance);
     $("#last-updated").text(shoeData[modalID].Last_Updated);
