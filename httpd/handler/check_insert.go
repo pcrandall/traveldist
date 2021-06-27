@@ -20,6 +20,8 @@ type InsertCheckFailure struct {
 
 func InsertCheck(c check.Adder) http.HandlerFunc {
 
+	utils.CheckErr(fmt.Errorf("BIG BAD INSERT ERROR\n"), "InsertCheck")
+
 	return func(w http.ResponseWriter, r *http.Request) {
 		var check check.Check
 		// var check models.Change

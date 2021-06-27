@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 
 	"github.com/pcrandall/travelDist/utils"
+	"gopkg.in/natefinch/lumberjack.v2"
 	"gopkg.in/yaml.v2"
 )
 
@@ -47,10 +48,17 @@ type ShoeParameters struct {
 }
 
 func init() {
-	logpath := filepath.Join(".", "logs")
-	if _, err := os.Stat(logpath); os.IsNotExist(err) {
-		os.MkdirAll(logpath, os.ModePerm)
-	}
+	errLog = log.New(logfile, "", log.Ldate|log.Ltime|log.LstdFlags)
+	errLog.SetOutput(&lumberjack.Logger{
+		Filename:   "./logs/logfile.txt",
+		MaxSize:    25, // megabytes after which new file is created
+		MaxBackups: 3,  // number of backups
+		MaxAge:     28, //days
+	})
+
+	log.SetOutput(logfile)
+
+	defer logfile.Close()
 
 	dbpath := filepath.Join(".", "db")
 	if _, err := os.Stat(dbpath); os.IsNotExist(err) {

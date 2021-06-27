@@ -2,11 +2,13 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
 	"regexp"
+	"runtime"
 	"sync"
 	"time"
 
@@ -16,7 +18,6 @@ import (
 	"github.com/pcrandall/travelDist/httpd/platform/shoeparameters"
 	"github.com/pcrandall/travelDist/utils"
 	viewHandler "github.com/pcrandall/travelDist/view/handler"
-	"gopkg.in/natefinch/lumberjack.v2"
 )
 
 var (
@@ -43,26 +44,8 @@ func main() {
 	flag.Parse()
 
 	// // initialize logging
-	// utils.InitLog()
+	utils.InitLog()
 	// log.SetOutput(utils.Logfile)
-
-	if err != nil {
-		panic(err)
-	}
-	errLog = log.New(logfile, "", log.Ldate|log.Ltime|log.LstdFlags)
-	errLog.SetOutput(&lumberjack.Logger{
-		Filename:   "./logs/logfile.txt",
-		MaxSize:    25, // megabytes after which new file is created
-		MaxBackups: 3,  // number of backups
-		MaxAge:     28, //days
-	})
-
-	log.SetOutput(logfile)
-
-	defer logfile.Close()
-
-	errLog.Println("Travel Distances Started")
-	// checkErr(fmt.Errorf("Fault Bot started\n"))// For testing only
 
 	// resize console window to default size
 	utils.ResizeWindow()
@@ -70,9 +53,9 @@ func main() {
 	// print out program header
 	utils.PrintHeader(ProgramName, Version)
 
-	utils.ErrLog.Println("Travel Distances started")
+	errLog.Println("Travel Distances started")
 	// // For testing only
-	// utils.CheckErr(fmt.Errorf("BIG BAD ERROR\n"), "PLZ NO MORE!!!")
+	// CheckErr(fmt.Errorf("BIG BAD ERROR\n"))
 
 	// set the config parameters
 	shoeparameters.SetShoeParameters(config.ShoeParameters.Check, config.ShoeParameters.Interval)
@@ -147,4 +130,21 @@ func ScrapPages(name string, ip string, wg *sync.WaitGroup) {
 	dbRow.Timestamp = utils.TrimString(lastDate)
 	dbRow.Distance = total[7:]
 	distancesSlice = append(distancesSlice, *dbRow)
+}
+
+func CheckErr(err error) {
+	defer RecoverPanic()
+	if err != nil {
+		panic(err)
+	}
+}
+
+func RecoverPanic() {
+	if r := recover(); r != nil {
+		// notice that we're using 1, so it will actually log the where
+		// the error happened, 0 = this function, we don't want that.
+		pc, fn, line, _ := runtime.Caller(1)
+		errLog.Printf("[error] in %s[%s:%d] %v %s", runtime.FuncForPC(pc).Name(), fn, line, err, r)
+		fmt.Printf("[error] in %s[%s:%d] %v %s\n\n", runtime.FuncForPC(pc).Name(), fn, line, err, r)
+	}
 }

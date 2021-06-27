@@ -35,6 +35,8 @@ func InitLog() {
 
 	log.SetOutput(Logfile)
 
+	log.Println("Utils Logfile init")
+
 	defer Logfile.Close()
 }
 
