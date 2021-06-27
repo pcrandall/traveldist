@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 	"regexp"
 	"sync"
 	"time"
@@ -15,6 +16,7 @@ import (
 	"github.com/pcrandall/travelDist/httpd/platform/shoeparameters"
 	"github.com/pcrandall/travelDist/utils"
 	viewHandler "github.com/pcrandall/travelDist/view/handler"
+	"gopkg.in/natefinch/lumberjack.v2"
 )
 
 var (
@@ -28,6 +30,8 @@ var (
 	loadingFramesChannel = make(chan bool)
 	wg                   sync.WaitGroup
 
+	logfile   *os.File
+	errLog    *log.Logger
 	err       error
 	restAPI   bool
 	writeFile bool
@@ -38,9 +42,27 @@ func main() {
 	flag.BoolVar(&restAPI, "r", false, "restAPI -r=true")
 	flag.Parse()
 
-	// initialize logging
-	utils.InitLog()
-	log.SetOutput(utils.Logfile)
+	// // initialize logging
+	// utils.InitLog()
+	// log.SetOutput(utils.Logfile)
+
+	if err != nil {
+		panic(err)
+	}
+	errLog = log.New(logfile, "", log.Ldate|log.Ltime|log.LstdFlags)
+	errLog.SetOutput(&lumberjack.Logger{
+		Filename:   "./logs/logfile.txt",
+		MaxSize:    25, // megabytes after which new file is created
+		MaxBackups: 3,  // number of backups
+		MaxAge:     28, //days
+	})
+
+	log.SetOutput(logfile)
+
+	defer logfile.Close()
+
+	errLog.Println("Travel Distances Started")
+	// checkErr(fmt.Errorf("Fault Bot started\n"))// For testing only
 
 	// resize console window to default size
 	utils.ResizeWindow()

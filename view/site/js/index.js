@@ -3,7 +3,6 @@ var modalID; // the current navette modal that's open
 var changeParams; // the current navette modal that's open
 
 $(document).ready(function () {
-
   fetch("http://localhost:8001/distparam")
     .then((response) => response.json())
     .then((data) => {
@@ -15,6 +14,7 @@ $(document).ready(function () {
     .then((response) => response.json())
     .then((data) => {
       shoeData = data;
+      console.log({ shoeData });
       // populate the button value with the distance from the db
       const navButtons = $("[id^=N]");
       const n = Object.entries(navButtons);
@@ -43,11 +43,17 @@ $(document).ready(function () {
     $("#change-notes").val(
       "Performed By: \nShoe Distance(km): \nShoe Measurement: \nOther Notes: "
     );
+    $("#check-notes").val(
+      "Performed By: \nShoe Distance(km): \nOther Notes: "
+    );
     $("#days-installed").text(
-      shoeData[modalID].Days_Installed === "" ? "0" : shoeData[modalID].Days_Installed
+      shoeData[modalID].Days_Installed === ""
+        ? "0"
+        : shoeData[modalID].Days_Installed
     );
     $("#shoe-travel").text(shoeData[modalID].Shoe_Travel + " km");
-    $("#last-notes").text(shoeData[modalID].Notes);
+    $("#change-last-notes").text(shoeData[modalID].Notes);
+    $("#check-last-notes").text(shoeData[modalID].Notes);
   });
 
   const navDiv = $("[id$=div]");
@@ -60,7 +66,8 @@ $(document).ready(function () {
     }
   });
 
-  $("#shoesModal").on("hidden.bs.modal", function () {
+  // Clear the values when the modal closes
+  $("#changeModal,#checkModal").on("hidden.bs.modal", function () {
     $(this)
       .find("input,select")
       .val("")
@@ -71,14 +78,17 @@ $(document).ready(function () {
     $("#change-notes").val(
       "Performed By: \nShoe Distance(km): \nShoe Measurement: \nOther Notes: "
     );
+    $("#check-notes").val(
+      "Performed By: \nShoe Distance(km): \nOther Notes: "
+    );
   });
 
   // submit change
-  $("#submit-change").click(async function () {
-    const New_Change_Date = $("#date").val(); // string
+  $("#submit-shoe-change").click(async function () {
+    const New_Change_Date = $("#change-date").val(); // string
     const New_Change_Distance = parseInt($("#change-distance").val()); // distance needs to be int
     const New_Change_Notes = $("#change-notes").val(); // string
-    const formData = {
+    const changeFormData = {
       Shuttle: shoeData[modalID].Shuttle,
       New_Change_Distance:
         New_Change_Distance === NaN ? "nil" : New_Change_Distance,
@@ -87,10 +97,33 @@ $(document).ready(function () {
       Previous_Change_UUID: shoeData[modalID].UUID,
     };
 
-    console.log({ formData });
-    postData("http://localhost:8001/dist", formData).then((data) => {
+    console.log({ changeFormData });
+    postData("http://localhost:8001/changeshoes", changeFormData).then((data) => {
       console.log(data);
     });
+  });
+});
+
+// submit check
+$("#submit-shoe-check").click(async function () {
+  const New_Check_Date = $("#check-date").val(); // string
+  const New_Check_Distance = parseInt($("#check-distance").val()); // distance needs to be int
+  const New_Check_Notes = $("#check-notes").val(); // string
+  const New_Check_Measurement = parseFloat($("#check-measurement").val()) // string
+
+  const checkFormData = {
+    Shuttle: shoeData[modalID].Shuttle,
+    New_Check_Distance:
+      New_Check_Distance === NaN ? "nil" : New_Check_Distance,
+    New_Check_Date: New_Check_Date === "" ? "empty" : New_Check_Date,
+    New_Check_Notes: New_Check_Notes,
+    New_Check_Measurement: New_Check_Measurement,
+    Previous_Check_UUID: shoeData[modalID].UUID,
+  };
+
+  console.log({ checkFormData });
+  postData("http://localhost:8001/checkshoes", checkFormData).then((data) => {
+    console.log(data);
   });
 });
 
