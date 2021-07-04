@@ -20,9 +20,10 @@ type InsertCheckFailure struct {
 
 func InsertCheck(c check.Adder) http.HandlerFunc {
 
-	utils.CheckErr(fmt.Errorf("BIG BAD INSERT ERROR\n"), "InsertCheck")
+	// utils.CheckErr(fmt.Errorf("BIG BAD INSERT ERROR\n"), "InsertCheck")
 
 	return func(w http.ResponseWriter, r *http.Request) {
+		fmt.Println("we insertin")
 		var check check.Check
 		// var check models.Change
 		utils.HttpPrettyPrintRequest(r)
@@ -55,10 +56,10 @@ func InsertCheck(c check.Adder) http.HandlerFunc {
 		if err != nil {
 			greatJob := &Success{"Great Success!"}
 			fmt.Println(err)
-			err = json.NewEncoder(w).Encode(&greatJob) // encode to json and send to client
+			json.NewEncoder(w).Encode(&greatJob) // encode to json and send to client
 		} else {
 			badJob := &Failure{err}
-			err = json.NewEncoder(w).Encode(&badJob) // encode to json and send to client
+			json.NewEncoder(w).Encode(&badJob) // encode to json and send to client
 		}
 
 		id, err := res.LastInsertId()
