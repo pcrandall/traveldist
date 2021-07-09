@@ -5,11 +5,11 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/pcrandall/travelDist/httpd/platform/distances"
 	"github.com/pcrandall/travelDist/utils"
 )
 
-func GetDistances(d distances.Getter) http.HandlerFunc {
+func GetDistances() http.HandlerFunc {
+	// func GetDistances(d distances.Getter) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// d.GetAll()
 		// items := feed.GetAll()

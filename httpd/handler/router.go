@@ -8,7 +8,6 @@ import (
 	"github.com/go-chi/chi"
 	change "github.com/pcrandall/travelDist/httpd/platform/change_shoes"
 	check "github.com/pcrandall/travelDist/httpd/platform/check_shoes"
-	"github.com/pcrandall/travelDist/httpd/platform/distances"
 	"github.com/rs/cors"
 )
 
@@ -18,13 +17,14 @@ func ChiRouter(port string) {
 		AllowedMethods: []string{"GET", "POST", "PUT", "DELETE"}, // Allowing only get, just an example
 	})
 	r := chi.NewRouter()
-	distance := distances.New()
+	// distance := distances.New()
 	change := change.New()
 	check := check.New()
 
-	r.Get("/dist", GetDistances(distance))
+	r.Get("/dist", GetDistances())
 	r.Get("/distparam", GetShoeParameters())
-	r.Get("/checkshoes", GetCheck(check))
+	r.Get("/checkshoes", GetCheck())
+
 	r.Post("/changeshoes", InsertChange(change))
 	r.Post("/checkshoes", InsertCheck(check))
 

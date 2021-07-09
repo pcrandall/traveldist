@@ -76,7 +76,13 @@ $(document).ready(function () {
     );
     $("#shoe-travel").text(shoeData[modalID].Shoe_Travel + " km");
     $("#change-last-notes").text(shoeData[modalID].Notes);
-    $("#check-last-notes").text(shoeData[modalID].Notes);
+
+    $("#last-check-distance").text(checkData[modalID].Distance);
+    $("#last-check-distance-1500km").text(checkData[modalID].Distance_1500km);
+    $("#last-check-timestamp").text(checkData[modalID].Timestamp);
+    $("#last-check-wear").text(checkData[modalID].Wear);
+    $("#last-check-notes").text(checkData[modalID].Notes);
+
   });
 
   const navDiv = $("[id$=div]");

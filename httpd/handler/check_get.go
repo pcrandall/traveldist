@@ -10,7 +10,7 @@ import (
 	"github.com/pcrandall/travelDist/utils"
 )
 
-func GetCheck(c check.Getter) http.HandlerFunc {
+func GetCheck() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		db, err := sql.Open("sqlite3", "db/traveldistances.db")
@@ -23,7 +23,7 @@ func GetCheck(c check.Getter) http.HandlerFunc {
 		keys := make(map[string]check.Check)
 		for rows.Next() {
 			var check check.Check
-			rows.Scan(&check.Shuttle, &check.Distance, &check.Timestamp, &check.Notes, &check.UUID, &check.Wear)
+			rows.Scan(&check.Shuttle, &check.Distance, &check.Distance_1500km, &check.Timestamp, &check.Notes, &check.UUID, &check.Wear)
 			utils.CheckErr(err, "")
 			keys[check.Shuttle] = check
 			// log.Printf("database.go.72 getDists(): %#v\n", dist)
