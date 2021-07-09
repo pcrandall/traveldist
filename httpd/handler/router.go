@@ -24,6 +24,7 @@ func ChiRouter(port string) {
 
 	r.Get("/dist", GetDistances(distance))
 	r.Get("/distparam", GetShoeParameters())
+	r.Get("/checkshoes", GetCheck(check))
 	r.Post("/changeshoes", InsertChange(change))
 	r.Post("/checkshoes", InsertCheck(check))
 

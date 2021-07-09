@@ -17,3 +17,12 @@ type CleanTravelDistances struct {
 	Notes                 string
 	UUID                  string
 }
+
+// type CleanShoeCheck struct {
+// 	Shuttle              string
+// 	Shoes_Check_Distance int
+// 	Last_Updated         string
+// 	Notes                string
+// 	UUID                 string
+// 	Wear                 float64
+// }

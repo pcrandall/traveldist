@@ -10,10 +10,10 @@ type Adder interface {
 
 type Check struct {
 	Shuttle   string `json:"Shuttle"`
-	Distance  int    `json:"New_Check_Distance"`
-	Timestamp string `json:"New_Check_Date"`
-	Notes     string `json:"New_Check_Notes"`
-	UUID      string `json:"Previous_Check_UUID"`
+	Distance  int    `json:"Distance"`
+	Timestamp string `json:"Timestamp"`
+	Notes     string `json:"Notes"`
+	UUID      string `json:"UUID"`
 	Wear      string `json:"Wear"`
 }
 

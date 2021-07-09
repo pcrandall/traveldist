@@ -1,4 +1,5 @@
 var shoeData; // this is all the "CURRENT" shoe data from the sqlite db
+var checkData; // this is all the "CURRENT" shoe data from the sqlite db
 var modalID; // the current navette modal that's open
 var changeParams; // the current navette modal that's open
 
@@ -11,6 +12,27 @@ $(document).ready(function () {
       console.log({ changeParams });
     });
 
+  fetch("http://localhost:8001/checkshoes")
+    .then((response) => response.json())
+    .then((data) => {
+      checkData = data;
+      console.log({ checkData });
+      // populate the button value with the distance from the db
+      const navButtons = $("[id^=N]");
+      const n = Object.entries(navButtons);
+      n.forEach(([key, value]) => {
+        if (checkData[value.id] !== undefined) {
+          let lastCheck = checkData[value.id].Distance;
+          console.log(key, {lastCheck})
+          // if (lastCheck >= 500) {
+          //   $("#" + value.id).removeClass("btn-success");
+          //   $("#" + value.id).addClass("btn-danger");
+          // }
+        }
+      });
+    });
+
+
   fetch("http://localhost:8001/dist")
     .then((response) => response.json())
     .then((data) => {
@@ -21,9 +43,9 @@ $(document).ready(function () {
       const n = Object.entries(navButtons);
       n.forEach(([key, value]) => {
         if (value.id !== undefined) {
-          let dist = shoeData[value.id].Shoe_Travel;
-          $("#" + value.id).text(dist);
-          if (dist >= 1500) {
+          let lastChange = shoeData[value.id].Shoe_Travel;
+          $("#" + value.id).text(lastChange);
+          if (lastChange >= 1500) {
             $("#" + value.id).removeClass("btn-success");
             $("#" + value.id).addClass("btn-danger");
           }
@@ -90,25 +112,23 @@ $(document).ready(function () {
 
 $(document).ready(function () {
   // submit check
-  $("#checkModal").click(async function () {
-    alert("we submittin")
-    console.log("we submittin")
-    const New_Check_Date = $("#check-date").val(); // string
-    const New_Check_Distance = parseInt($("#check-distance").val()); // distance needs to be int
-    const New_Check_Notes = $("#check-notes").val(); // string
-    const New_Check_Measurement = parseFloat($("#check-measurement").val()) // string
+  $("#submit-shoe-check").click(async function () {
+    const Timestamp = $("#check-date").val(); // string
+    const Distance = parseInt($("#check-distance").val()); // distance needs to be int
+    const Notes = $("#check-notes").val(); // string
+    const Measurement = parseFloat($("#check-measurement").val()) // string
 
     const checkFormData = {
       Shuttle: shoeData[modalID].Shuttle,
-      New_Check_Distance:
-        New_Check_Distance === NaN ? "nil" : New_Check_Distance,
-      New_Check_Date: New_Check_Date === "" ? "empty" : New_Check_Date,
-      New_Check_Notes: New_Check_Notes,
-      New_Check_Measurement: New_Check_Measurement,
-      Previous_Check_UUID: shoeData[modalID].UUID,
+      Distance:
+        Distance === NaN ? "nil" : Distance,
+      Timestamp: Timestamp === "" ? "empty" : Timestamp,
+      Notes: Notes,
+      Measurement: Measurement,
+      UUID: checkData[modalID].UUID,
     };
 
-    console.log({ checkFormData });
+    // console.log({ checkFormData });
     postData("http://localhost:8001/checkshoes", checkFormData).then((data) => {
       console.log(data);
     });
