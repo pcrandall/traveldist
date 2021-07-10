@@ -3,7 +3,6 @@ package handler
 import (
 	"database/sql"
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	check "github.com/pcrandall/travelDist/httpd/platform/check_shoes"
@@ -28,7 +27,7 @@ func GetCheck() http.HandlerFunc {
 			keys[check.Shuttle] = check
 			// log.Printf("database.go.72 getDists(): %#v\n", dist)
 		}
-		fmt.Printf("KEYS: %#v\n\n", keys)
+		// fmt.Printf("KEYS: %#v\n\n", keys)
 		json.NewEncoder(w).Encode(&keys) // encode to json and send to client
 		utils.CheckErr(err, "JSON encoding error")
 	}

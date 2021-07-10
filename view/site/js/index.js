@@ -77,11 +77,13 @@ $(document).ready(function () {
     $("#shoe-travel").text(shoeData[modalID].Shoe_Travel + " km");
     $("#change-last-notes").text(shoeData[modalID].Notes);
 
-    $("#last-check-distance").text(checkData[modalID].Distance);
-    $("#last-check-distance-1500km").text(checkData[modalID].Distance_1500km);
-    $("#last-check-timestamp").text(checkData[modalID].Timestamp);
-    $("#last-check-wear").text(checkData[modalID].Wear);
-    $("#last-check-notes").text(checkData[modalID].Notes);
+    if(checkData[modalID] !== undefined){
+      $("#last-check-distance").text(checkData[modalID].Distance);
+      $("#last-check-distance-1500km").text(checkData[modalID].Distance_1500km);
+      $("#last-check-timestamp").text(checkData[modalID].Timestamp);
+      $("#last-check-wear").text(checkData[modalID].Wear);
+      $("#last-check-notes").text(checkData[modalID].Notes);
+    }
 
   });
 
@@ -122,7 +124,7 @@ $(document).ready(function () {
     const Timestamp = $("#check-date").val(); // string
     const Distance = parseInt($("#check-distance").val()); // distance needs to be int
     const Notes = $("#check-notes").val(); // string
-    const Measurement = parseFloat($("#check-measurement").val()) // string
+    const Wear = parseFloat($("#check-measurement").val()) // string
 
     const checkFormData = {
       Shuttle: shoeData[modalID].Shuttle,
@@ -130,8 +132,8 @@ $(document).ready(function () {
         Distance === NaN ? "nil" : Distance,
       Timestamp: Timestamp === "" ? "empty" : Timestamp,
       Notes: Notes,
-      Measurement: Measurement,
-      UUID: checkData[modalID].UUID,
+      Wear: Wear,
+      UUID: checkData[modalID] === undefined ? "" : checkData[modalID].UUID,
     };
 
     // console.log({ checkFormData });
