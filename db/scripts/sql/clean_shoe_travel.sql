@@ -1,1 +1,1 @@
-select * from clean_shoe_travel;
+select * from view_change;
