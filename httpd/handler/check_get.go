@@ -16,7 +16,7 @@ func GetCheck() http.HandlerFunc {
 		utils.CheckErr(err, "check_get.go.17: Error connecting to database\t")
 		defer db.Close()
 
-		rows, err := db.Query(`SELECT * FROM clean_shoe_check;`)
+		rows, err := db.Query(`SELECT * FROM view_check;`)
 		utils.CheckErr(err, "check_get.go.21: Database Query error\t")
 
 		keys := make(map[string]check.Check)

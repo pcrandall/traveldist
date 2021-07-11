@@ -20,7 +20,7 @@ func GetDistances() http.HandlerFunc {
 		utils.CheckErr(err, "database.go.60: Error connecting to database\t")
 		defer db.Close()
 
-		rows, err := db.Query(`SELECT * FROM clean_shoe_travel;`)
+		rows, err := db.Query(`SELECT * FROM view_change;`)
 		utils.CheckErr(err, "database.go.64: Database Query error\t")
 
 		keys := make(map[string]CleanTravelDistances)
