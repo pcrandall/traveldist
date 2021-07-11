@@ -19,10 +19,10 @@ func GetCheck() http.HandlerFunc {
 		rows, err := db.Query(`SELECT * FROM view_check;`)
 		utils.CheckErr(err, "check_get.go.21: Database Query error\t")
 
-		keys := make(map[string]check.Check)
+		keys := make(map[string]check.ViewCheck)
 		for rows.Next() {
-			var check check.Check
-			rows.Scan(&check.Shuttle, &check.Distance, &check.Distance_1500km, &check.Timestamp, &check.Notes, &check.UUID, &check.Wear)
+			var check check.ViewCheck
+			rows.Scan(&check.Shuttle, &check.ZeroDistance, &check.LastCheckDistance, &check.CheckTrigger, &check.CurrentDistance, &check.CheckShoes, &check.LastCheckTimestamp, &check.LastCheckNotes, &check.LastCheckUUID, &check.LastCheckWear)
 			utils.CheckErr(err, "")
 			keys[check.Shuttle] = check
 			// log.Printf("database.go.72 getDists(): %#v\n", dist)

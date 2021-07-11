@@ -103,10 +103,12 @@ getShoeCheck = async () => {
             const n = Object.entries(navButtons);
             n.forEach(([key, value]) => {
                 if (checkData[value.id] !== undefined) {
-                    let lastCheck = checkData[value.id].Distance_1500km;
-                    if (lastCheck <= 500) {
-                      $("#" + value.id).removeClass("btn-danger");
+                    if (checkData[value.id].Check_Shoes === true) {
+                      $("#" + value.id).removeClass("btn-success");
+                      $("#" + value.id).addClass("btn-danger");
+                    }else{
                       $("#" + value.id).addClass("btn-success");
+                      $("#" + value.id).removeClass("btn-danger");
                     }
                 }
             });
@@ -184,6 +186,7 @@ writeButtonDistance = () => {
             $("#" + value.id).text(name);
         }
     });
+//     });
 }
 
 // Clear the values when the modal closes
