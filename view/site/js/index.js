@@ -16,10 +16,10 @@ $(document).ready(function() {
 initCheckListeners = () => {
     // submit check
     $("#submit-shoe-check").click(async function() {
-        const Timestamp = $("#check-date").val(); // string
-        const Distance = parseInt($("#check-distance").val()); // distance needs to be int
-        const Notes = $("#check-notes").val(); // string
-        const Wear = parseFloat($("#check-measurement").val()) // float
+        const Timestamp = $("#date").val(); // string
+        const Distance = parseInt($("#distance").val()); // distance needs to be int
+        const Notes = $("#notes").val(); // string
+        const Wear = parseFloat($("#measurement").val()) // float
 
         const checkFormData = {
             Shuttle: shoeData[modalID].Shuttle,
@@ -40,9 +40,9 @@ initCheckListeners = () => {
 initChangeListeners = () => {
     // submit change
     $("#submit-shoe-change").click(async function() {
-        const New_Change_Date = $("#change-date").val(); // string
-        const New_Change_Distance = parseInt($("#change-distance").val()); // distance needs to be int
-        const New_Change_Notes = $("#change-notes").val(); // string
+        const New_Change_Date = $("#date").val(); // string
+        const New_Change_Distance = parseInt($("#distance").val()); // distance needs to be int
+        const New_Change_Notes = $("#notes").val(); // string
         const changeFormData = {
             Shuttle: shoeData[modalID].Shuttle,
             New_Change_Distance: New_Change_Distance === NaN ? "nil" : New_Change_Distance,
@@ -143,33 +143,28 @@ initModalData = async () => {
     // navette buttons send data to modal form
     $("#distanceContainer").on("click", "button", function() {
         modalID = this.id;
-        $("#change-title").text(modalID + " Collector Shoe Change");
-        $("#check-title").text(modalID + " Collector Shoes Check");
-        $("#button-title").text(modalID + " Collector Shoes");
-        $("#current-distance").text(shoeData[modalID].Shoes_Last_Distance);
-        $("#last-updated").text(shoeData[modalID].Last_Updated);
-        $("#last-distance").text(shoeData[modalID].Shoes_Change_Distance);
-        $("#last-date").text(shoeData[modalID].Shoes_Last_Changed);
-        $("#change-notes").val(
-            "Performed By: \nShoe Distance(km): \nShoe Measurement: \nOther Notes: "
+        $("#notes").val(
+            "Shoe Distance(km): \nOther Notes: "
         );
-        $("#check-notes").val(
-            "Performed By: \nShoe Distance(km): \nOther Notes: "
-        );
+        $("#title").text(modalID + " Collector Shoes");
+        $("#shoe-travel").text(shoeData[modalID].Shoe_Travel + " km");
         $("#days-installed").text(
             shoeData[modalID].Days_Installed === "" ?
             "0" :
             shoeData[modalID].Days_Installed
         );
-        $("#shoe-travel").text(shoeData[modalID].Shoe_Travel + " km");
-        $("#change-last-notes").text(shoeData[modalID].Notes);
+        $("#current-distance").text(shoeData[modalID].Shoes_Last_Distance);
+        $("#last-updated").text(shoeData[modalID].Last_Updated);
+        $("#change-distance").text(shoeData[modalID].Shoes_Change_Distance);
+        $("#change-date").text(shoeData[modalID].Shoes_Last_Changed);
+        $("#change-notes").text(shoeData[modalID].Notes);
 
         if (checkData[modalID] !== undefined) {
-            $("#last-check-distance").text(checkData[modalID].Distance);
+            $("#check-distance").text(checkData[modalID].Last_Check_Distance);
+            $("#check-timestamp").text(checkData[modalID].Last_Check_Timestamp);
+            $("#check-wear").text(checkData[modalID].Last_Check_Wear);
             $("#last-check-distance-1500km").text(checkData[modalID].Distance_1500km);
-            $("#last-check-timestamp").text(checkData[modalID].Timestamp);
-            $("#last-check-wear").text(checkData[modalID].Wear);
-            $("#last-check-notes").text(checkData[modalID].Notes);
+            $("#check-notes").text(checkData[modalID].Last_Check_Notes);
         }
 
     $("#check-date", "#check-distance", "#check-measurement", "#last-check-distance", "#last-check-distance-1500km", "#last-check-timestamp", "#last-check-wear", "#last-check-notes").val("");
