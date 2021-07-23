@@ -79,6 +79,21 @@
       ::-webkit-scrollbar-corner {
         background: #DDD;
       }
+
+      .duet-date__input{
+        padding: 8px !important;
+      }
+
+      #distance, #measurement, #notes{
+        font-size: 16px;
+        font-family: apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        font-style: inherit;
+        font-variant-caps: inherit;
+        font-weight: inherit;
+        font-stretch: inherit;
+      }
+
+
     </style>
   </head>
   <body style="background: #f4f4f4">
@@ -560,7 +575,6 @@
                   >Distance:</label
                 >
                 <input
-                  style="height: 3.2em; font-size: 16px; !important"
                   type="text"
                   class="form-control"
                   id="distance"
@@ -573,11 +587,10 @@
                   >Measurement:</label
                 >
                 <input
-                  style="height: 3.2em; font-size: 16px; !important"
                   type="text"
                   class="form-control"
                   id="measurement"
-                  placeholder="2.5-5.0"
+                  placeholder=""
                 />
               </div>
               <!-- notes -->
@@ -586,14 +599,14 @@
                   >Notes:</label
                 >
                 <textarea
-                  style="resize: none; white-space: pre-wrap"
+                  style="resize: none; "
                   class="form-control"
                   id="notes"
-                  placeholder="Enter Notes Here:"
+                  placeholder=""
                 ></textarea>
               </div>
             </form>
-            <div class="modal-footer" style="border: none; !important">
+            <div class="modal-footer justify-content-between" style="border: none; !important">
               <button
                 id="submit-shoe-change"
                 type="button"

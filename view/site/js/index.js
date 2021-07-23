@@ -1,7 +1,7 @@
 var shoeData; // this is all the "CURRENT" shoe data from the sqlite db
 var checkData; // this is all the "CURRENT" shoe data from the sqlite db
 var modalID; // the current navette modal that's open
-var changeParams; // the current navette modal that's open
+var shoeParams; // the current navette modal that's open
 
 $(document).ready(function() {
     getDistParam()
@@ -11,6 +11,8 @@ $(document).ready(function() {
         .then(initModalData())
         .then(initChangeListeners())
         .then(initCheckListeners())
+
+        // $("#date").addClass("form-control");
 });
 
 initCheckListeners = () => {
@@ -83,9 +85,9 @@ getDistParam = async () => {
     fetch("http://localhost:8001/distparam")
         .then((response) => response.json())
         .then((data) => {
-            changeParams = data;
+            shoeParams = data;
             console.log({
-                changeParams
+                shoeParams
             });
         });
 }
@@ -130,7 +132,7 @@ getShoeDist = async () => {
                 if (value.id !== undefined) {
                     let lastChange = shoeData[value.id].Shoe_Travel;
                     $("#" + value.id).text(lastChange);
-                    if (lastChange >= 1500) {
+                    if (lastChange >= shoeParams.Check) {
                         $("#" + value.id).removeClass("btn-success");
                         $("#" + value.id).addClass("btn-danger");
                     }
@@ -143,10 +145,12 @@ initModalData = async () => {
     // navette buttons send data to modal form
     $("#distanceContainer").on("click", "button", function() {
         modalID = this.id;
-        $("#notes").val(
-            "Shoe Distance(km): \nOther Notes: "
-        );
+        $("#notes").val("");
+        $("#notes").val("");
+        $("#notes").attr("placeholder", "Put any useful information here");
+        $("#footer").scrollTop(0);
         $("#title").text(modalID + " Collector Shoes");
+        $("#measurement").attr("placeholder", shoeParams.Min_Shoe.toFixed(1) + "-" + shoeParams.Max_Shoe.toFixed(1));
         $("#shoe-travel").text(shoeData[modalID].Shoe_Travel + " km");
         $("#days-installed").text(
             shoeData[modalID].Days_Installed === "" ?
@@ -162,10 +166,11 @@ initModalData = async () => {
         if (checkData[modalID] !== undefined) {
             $("#check-distance").text(checkData[modalID].Last_Check_Distance);
             $("#check-timestamp").text(checkData[modalID].Last_Check_Timestamp);
-            $("#check-wear").text(checkData[modalID].Last_Check_Wear);
+            $("#check-wear").text(checkData[modalID].Last_Check_Wear.toFixed(1));
             $("#last-check-distance-1500km").text(checkData[modalID].Distance_1500km);
             $("#check-notes").text(checkData[modalID].Last_Check_Notes);
         }
+
 
     $("#check-date", "#check-distance", "#check-measurement", "#last-check-distance", "#last-check-distance-1500km", "#last-check-timestamp", "#last-check-wear", "#last-check-notes").val("");
     });

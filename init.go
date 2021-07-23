@@ -43,8 +43,10 @@ type Controller struct {
 
 // ShoeCheck
 type ShoeParameters struct {
-	Check    int `yaml:"check"`
-	Interval int `yaml:"interval"`
+	Check    int     `yaml:"check"`
+	Interval int     `yaml:"interval"`
+	Min_Shoe float64 `yaml:"min_shoe"`
+	Max_Shoe float64 `yaml:"max_shoe"`
 }
 
 func init() {

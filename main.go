@@ -58,7 +58,7 @@ func main() {
 	// CheckErr(fmt.Errorf("BIG BAD ERROR\n"))
 
 	// set the config parameters
-	shoeparameters.SetShoeParameters(config.ShoeParameters.Check, config.ShoeParameters.Interval)
+	shoeparameters.SetShoeParameters(config.ShoeParameters.Check, config.ShoeParameters.Interval, config.ShoeParameters.Min_Shoe, config.ShoeParameters.Max_Shoe)
 
 	if restAPI == true {
 		go viewHandler.ServeView(config.View.Port) // front end server
