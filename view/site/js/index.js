@@ -145,11 +145,25 @@ initModalData = async () => {
     // navette buttons send data to modal form
     $("#distanceContainer").on("click", "button", function() {
         modalID = this.id;
-        $("#notes").val("");
-        $("#notes").val("");
-        $("#notes").attr("placeholder", "Put any useful information here");
-        $("#footer").scrollTop(0);
         $("#title").text(modalID + " Collector Shoes");
+        $("#date").val("");
+        $("#distance").val("");
+        $("#measurement").val("");
+        $("#notes").val("");
+        $("#shoe-travel").text("");
+        $("#current-distance").text("");
+        $("#last-updated").text("");
+        $("#change-distance").text("");
+        $("#change-date").text("");
+        $("#change-notes").text("");
+        $("#check-distance").text("");
+        $("#check-timestamp").text("");
+        $("#check-wear").text("");
+        $("#last-check-distance-1500km").text("");
+        $("#check-notes").text("");
+
+        // $("#notes").attr("placeholder", "Distance(km):\nOther:");
+        $("#notes").attr("placeholder", "Useful information here:");
         $("#measurement").attr("placeholder", shoeParams.Min_Shoe.toFixed(1) + "-" + shoeParams.Max_Shoe.toFixed(1));
         $("#shoe-travel").text(shoeData[modalID].Shoe_Travel + " km");
         $("#days-installed").text(
@@ -170,9 +184,7 @@ initModalData = async () => {
             $("#last-check-distance-1500km").text(checkData[modalID].Distance_1500km);
             $("#check-notes").text(checkData[modalID].Last_Check_Notes);
         }
-
-
-    $("#check-date", "#check-distance", "#check-measurement", "#last-check-distance", "#last-check-distance-1500km", "#last-check-timestamp", "#last-check-wear", "#last-check-notes").val("");
+        $("#footer").scrollTop(0);
     });
 }
 
