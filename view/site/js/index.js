@@ -132,10 +132,10 @@ getShoeDist = async () => {
                 if (value.id !== undefined) {
                     let lastChange = shoeData[value.id].Shoe_Travel;
                     $("#" + value.id).text(lastChange);
-                    if (lastChange >= shoeParams.Check) {
-                        $("#" + value.id).removeClass("btn-success");
-                        $("#" + value.id).addClass("btn-danger");
-                    }
+                    // if (lastChange >= shoeParams.Check) {
+                    //     $("#" + value.id).removeClass("btn-success");
+                    //     $("#" + value.id).addClass("btn-danger");
+                    // }
                 }
             });
         });
